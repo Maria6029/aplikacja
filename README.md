@@ -1,4 +1,4 @@
-# aplikacja
+# aplikacja: SUDOKU
 
 
 ### Natalia Dańko 293183
