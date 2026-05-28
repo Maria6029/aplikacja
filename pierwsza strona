@@ -73,4 +73,150 @@ class GlowneOkno(QMainWindow):
                 padding: 0 15px;
             }}
         """
+       #pierwsza koluma-rejestracja użytkownika
+        kolumna1 = QVBoxLayout()
+
+        grupa1 = QGroupBox("Rejestracja")
+        grupa1.setStyleSheet(style_boxa)
+
+        grupa1.setMinimumWidth(500)
+        grupa1.setMaximumWidth(650)
+    
+        napis_nazwa_swoja = QLabel("Wpisz swoje imię:")
+
+        napis_nazwa_swoja.setStyleSheet(f"""
+            font-family: 'Segoe UI';
+            font-size: 18px; 
+            color: {rgb(100, 116, 139)};
+            font-weight: normal;
+            background-color: transparent;
+        """)
+
+        kolumna1.addWidget(napis_nazwa_swoja)
+
+        self.lineedit_nazwa_swoja = QLineEdit()
+        self.lineedit_nazwa_swoja.setPlaceholderText("Twoje imię")
+
+        self.lineedit_nazwa_swoja.setStyleSheet(f"""
+            QLineEdit {{
+                padding: 18px;
+                font-size: 20px;
+                border: 1px solid {rgb(203, 213, 225)};
+                border-radius: 8px;
+                background: {rgb(255, 255, 255)};
+            }}
+        """)
+
+        kolumna1.addWidget(self.lineedit_nazwa_swoja)
+
+        kolumna1.addStretch()
+        
+        grupa1.setLayout(kolumna1)
+        menu_layout.addWidget(grupa1)
+
+        #druga kolumna-wybór poziomu trudności
+        kolumna2 = QVBoxLayout()
+
+        grupa2 = QGroupBox("Poziom trudności")
+        grupa2.setStyleSheet(style_boxa)
+
+        grupa2.setMinimumWidth(500)
+        grupa2.setMaximumWidth(650)
+
+        self.radio_latwy = QRadioButton("Łatwy")
+        self.radio_sredni = QRadioButton("Średni")
+        self.radio_trudny = QRadioButton("Trudny")
+        
+        self.radio_sredni.setChecked(True)
+        #ustawiamy styl boxow kolor, czcionke, obramowania
+        style_radio = f"""
+            QRadioButton {{
+                font-family: 'Segoe UI';
+                font-size: 20px;
+                color: {rgb(40, 40, 40)};
+                padding: 18px;
+                font-weight: normal;
+                background-color: {rgb(255, 255, 255)};
+                border-radius: 10px;
+                border: 1px solid {rgb(220, 220, 220)};
+            }}
+
+            QRadioButton:hover {{
+                background-color: {rgb(245, 245, 245)};
+            }}
+
+            QRadioButton::indicator {{
+                width: 22px;
+                height: 22px;
+            }}
+        """
+
+        for rb in [self.radio_latwy, self.radio_sredni, self.radio_trudny]:
+            rb.setStyleSheet(style_radio)
+            kolumna2.addWidget(rb)
+
+        kolumna2.addStretch()
+
+        grupa2.setLayout(kolumna2)
+        menu_layout.addWidget(grupa2)
+
+        #dodawanie "rozciągania"
+        menu_layout.addStretch(1)
+
+        #Dodajemy boki do głównego układu strony
+        layout_strony.addLayout(menu_layout)
+
+        #Przycisk startu
+        layout_przycisku = QHBoxLayout()
+        layout_przycisku.addStretch(1)
+        
+        self.przycisk_start = QPushButton("ROZPOCZNIJ GRĘ")
+
+        self.przycisk_start.setFixedWidth(550)
+        #ustawiamy kolory, czcionkę, obramowania
+        self.przycisk_start.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {rgb(30, 41, 59)};
+                color: {rgb(255, 255, 255)};
+                font-size: 24px;
+                font-weight: bold;
+                padding: 20px;
+                border-radius: 12px;
+                margin-top: 25px;
+            }}
+
+            QPushButton:hover {{
+                background-color: {rgb(51, 65, 85)};
+            }}
+        """)
+
+        layout_przycisku.addWidget(self.przycisk_start)
+        layout_przycisku.addStretch(1)
+        
+        layout_strony.addLayout(layout_przycisku)
+
+        #dodawanie "rozciągania"
+        layout_strony.addStretch(1)
+
+        #Głowne osadzenie layoutu
+        centralny_widget = QWidget()
+
+        centralny_widget.setStyleSheet(
+            f"background-color: {rgb(162, 171, 31)};"
+        )
+
+        centralny_widget.setLayout(layout_strony)
+        self.setCentralWidget(centralny_widget)
+
+
+#Uruchomienie
+def main():
+    aplikacja = QApplication(sys.argv)
+    glowne_okno = GlowneOkno()
+    glowne_okno.show()
+    sys.exit(aplikacja.exec())
+
+
+if __name__ == "__main__":
+    main()
 
