@@ -1,1 +1,76 @@
+import sys
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
+    QLabel, QLineEdit, QGroupBox, QRadioButton, QCheckBox, QPushButton
+)
+from PyQt5.QtGui import QFont
+
+
+def rgb(r, g, b):
+    return f"rgb({r}, {g}, {b})"
+
+
+class GlowneOkno(QMainWindow):
+    """tworzymy klasę nadrzędną, ustawiamy pozycję okna na ekranie, wymiary, tytuł okna"""
+    def __init__(self) -> None:
+        super().__init__()
+        self.setGeometry(100, 100, 1100, 750)
+        self.setWindowTitle("Sudoku")
+        self.initUI()
+        
+    def initUI(self):
+        """tworzymy menu i poszczególne kolumny. Ustawiamy rozmiar czcionki, kolor tła, tworzymy boxy"""
+
+        # Główny układ pionowy dla całej zawartości okna
+        layout_strony = QVBoxLayout()
+        layout_strony.setContentsMargins(50, 50, 50, 50)
+        layout_strony.setSpacing(30)
+
+        #dodajemy "rozciąganie" okna
+        layout_strony.addStretch(1)
+
+        #Nagłówek Sudoku
+        napis_sudoku = QLabel("SUDOKU")
+        napis_sudoku.setAlignment(Qt.AlignCenter)
+
+        napis_sudoku.setStyleSheet(f"""
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 95px;
+            font-weight: 900;
+            color: {rgb(30, 41, 59)};
+            letter-spacing: 12px;
+            margin-bottom: 25px;
+        """)
+
+        layout_strony.addWidget(napis_sudoku)
+
+        #Układ poziomy dla kolumn/boksów
+        menu_layout = QHBoxLayout()
+        menu_layout.setSpacing(50)
+
+        #dodajemy "rozciąganie" strony
+        menu_layout.addStretch(1)
+
+        #Wspólny styl dla boksów (GroupBox)
+        style_boxa = f"""
+             QGroupBox {{
+                font-family: 'Segoe UI';
+                font-size: 24px;\
+                font-weight: bold;
+                color: {rgb(51, 65, 85)};
+                background-color: {rgb(248, 249, 250)};
+                border: 1px solid {rgb(226, 232, 240)};
+                border-radius: 15px;
+                margin-top: 0px;
+                padding: 30px; 
+                padding-top: 35px;
+            }}
+            QGroupBox::title {{
+                subcontrol-origin: margin;
+                subcontrol-position: top center;
+                padding: 0 15px;
+            }}
+        """
 
