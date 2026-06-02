@@ -104,9 +104,12 @@ class GlowneOkno(QMainWindow):
                 border: 1px solid {rgb(203, 213, 225)};
                 border-radius: 8px;
                 background: {rgb(255, 255, 255)};
+                color: {rgb(0, 0, 0)};
+            }}
+            QLineEdit::placeholder {{
+                color: {rgb(148, 163, 184)};
             }}
         """)
-
         kolumna1.addWidget(self.lineedit_nazwa_swoja)
 
         kolumna1.addStretch()
