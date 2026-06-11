@@ -1,12 +1,14 @@
 import sys
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
     QLabel, QLineEdit, QGroupBox, QRadioButton, QCheckBox, QPushButton
 )
 from PyQt5.QtGui import QFont
 
+# from generator import Board
+# from PyQt5.QtGui import QIntValidator
 
 def rgb(r, g, b):
     return f"rgb({r}, {g}, {b})"
@@ -193,6 +195,8 @@ class GlowneOkno(QMainWindow):
             }}
         """)
 
+        # self.przycisk_start.clicked.connect(self.otworz_gre)
+
         layout_przycisku.addWidget(self.przycisk_start)
         layout_przycisku.addStretch(1)
         
@@ -210,6 +214,108 @@ class GlowneOkno(QMainWindow):
 
         centralny_widget.setLayout(layout_strony)
         self.setCentralWidget(centralny_widget)
+
+#     def otworz_gre(self):
+#         trudnosc = 1 # domyślnie średni
+#         if self.radio_latwy.isChecked(): trudnosc = 0
+#         elif self.radio_trudny.isChecked(): trudnosc = 2
+        
+#         # Otwieramy nowe okno i zamykamy stare
+#         self.nowe_okno = OknoGry(trudnosc)
+#         self.nowe_okno.show()
+#         self.close()
+
+# # ==========================================================
+# # CZĘŚĆ GRY I PODŚWIETLANIA (WKLEJONE NA DOLE)
+# # ==========================================================
+# class SudokuCell(QLineEdit):
+#     fokus_otrzymany = pyqtSignal(int, int)
+
+#     def __init__(self, row, col, parent=None):
+#         super().__init__(parent)
+#         self.row = row
+#         self.col = col
+#         self.setMaxLength(1)
+#         self.setAlignment(Qt.AlignCenter)
+#         self.setValidator(QIntValidator(1, 9))
+
+#     def focusInEvent(self, event):
+#         super().focusInEvent(event)
+#         self.fokus_otrzymany.emit(self.row, self.col)
+
+# class OknoGry(QWidget):
+#     def __init__(self, trudnosc):
+#         super().__init__()
+#         self.setWindowTitle("Gra w Sudoku - Plansza")
+#         self.setGeometry(150, 150, 800, 800)
+#         self.setStyleSheet(f"background-color: rgb(162, 171, 31);")
+        
+#         layout_glowny_gry = QHBoxLayout()
+#         self.siatka_gry = QGridLayout()
+#         self.siatka_gry.setSpacing(0)
+#         self.komorki = [[None for _ in range(9)] for _ in range(9)]
+
+#         for wiersz in range(9):
+#             for kolumna in range(9):
+#                 komorka = SudokuCell(wiersz, kolumna)
+#                 komorka.fokus_otrzymany.connect(self.podswietl_obszary)
+#                 self.komorki[wiersz][kolumna] = komorka
+#                 self.siatka_gry.addWidget(komorka, wiersz, kolumna)
+
+#         layout_glowny_gry.addLayout(self.siatka_gry)
+#         self.setLayout(layout_glowny_gry)
+        
+#         self.wczytaj_logike(trudnosc)
+
+#     def wczytaj_logike(self, trudnosc):
+#         plansza = Board()
+#         plansza.generateQuestionBoardCode(trudnosc)
+
+#         for wiersz in range(9):
+#             for kolumna in range(9):
+#                 wartosc = plansza.board[wiersz][kolumna]
+#                 komorka = self.komorki[wiersz][kolumna]
+#                 komorka.clear()
+#                 self.ustaw_styl_komorki(komorka, wiersz, kolumna, "white")
+#                 if wartosc != 0:
+#                     komorka.setText(str(wartosc))
+#                     komorka.setReadOnly(True)
+#                 else:
+#                     komorka.setReadOnly(False)
+
+#     def ustaw_styl_komorki(self, komorka, r, c, kolor_tla):
+#         top = "2px solid black" if r % 3 == 0 else "1px solid #cbd5e1"
+#         left = "2px solid black" if c % 3 == 0 else "1px solid #cbd5e1"
+#         bottom = "2px solid black" if r == 8 else "0px"
+#         right = "2px solid black" if c == 8 else "0px"
+
+#         komorka.setStyleSheet(f"""
+#             QLineEdit {{
+#                 background-color: {kolor_tla};
+#                 color: black;
+#                 border-top: {top}; border-left: {left}; border-bottom: {bottom}; border-right: {right};
+#                 font-size: 24px; font-weight: bold;
+#             }}
+#         """)
+
+#     def podswietl_obszary(self, klik_wiersz, klik_kolumna):
+#         start_wiersza = (klik_wiersz // 3) * 3
+#         start_kolumny = (klik_kolumna // 3) * 3
+        
+#         for wiersz in range(9):
+#             for kolumna in range(9):
+#                 komorka = self.komorki[wiersz][kolumna]
+                
+#                 ten_sam_wiersz = (wiersz == klik_wiersz)
+#                 ta_sama_kolumna = (kolumna == klik_kolumna)
+#                 ten_sam_kwadrat = (start_wiersza <= wiersz < start_wiersza + 3 and start_kolumny <= kolumna < start_kolumny + 3)
+                
+#                 if wiersz == klik_wiersz and kolumna == klik_kolumna:
+#                     self.ustaw_styl_komorki(komorka, wiersz, kolumna, "#bae6fd")
+#                 elif ten_sam_wiersz or ta_sama_kolumna or ten_sam_kwadrat:
+#                     self.ustaw_styl_komorki(komorka, wiersz, kolumna, "#e0f2fe")
+#                 else:
+#                     self.ustaw_styl_komorki(komorka, wiersz, kolumna, "white")
 
 
 #Uruchomienie
