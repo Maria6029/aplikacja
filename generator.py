@@ -1,7 +1,39 @@
 import copy
 import random
-
+import pygame
 class Board:
+    def isSolved(self):
+        # brak pustych pól
+        for row in range(9):
+            for col in range(9):
+                if self.board[row][col] == 0:
+                    return False
+
+        # brak błędów
+        if len(self.getErrors()) > 0:
+            return False
+
+        return True
+    def getErrors(self):
+        errors = set()
+
+        for row in range(9):
+            for col in range(9):
+                num = self.board[row][col]
+
+                if num == 0:
+                    continue
+
+                # tymczasowo usuwamy liczbę
+                self.board[row][col] = 0
+
+                if not self.checkSpace(num, (row, col)):
+                    errors.add((row, col))
+
+                # przywracamy
+                self.board[row][col] = num
+
+        return errors
     def __init__(self, code=None):
         self.__resetBoard()
 
@@ -241,12 +273,26 @@ class Board:
 if __name__ == "__main__":
     board = Board()
 
-    question_board_code = board.generateQuestionBoardCode(1)
+    question_board_code = board.generateQuestionBoardCode(0)
+
 
     print("CODE (string):")
     print(question_board_code[0])
 
     print("\nBOARD (2D):")
     board.printBoard()
+    fixed_cells = set()
+
+    for row in range(9):
+        for col in range(9):
+            if board.board[row][col] != 0:
+                fixed_cells.add((row, col))
+
+
+
+
+
+
+
 
 
