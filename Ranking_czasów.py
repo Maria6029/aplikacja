@@ -8,6 +8,10 @@ from PyQt5.QtWidgets import (
 )
 
 
+def rgb(r, g, b):
+    return f"rgb({r}, {g}, {b})"
+
+
 class RankingManager:
     """Klasa tworząca ranking czasów graczy z podziałem na poziomy trudności"""
 
@@ -64,7 +68,9 @@ class RankingOkno(QDialog):
     def initUI(self):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(50, 50, 50, 50)
-        self.setStyleSheet("background-color: rgb(248, 249, 250);")
+        self.setStyleSheet("""
+            background-color: rgb(162, 171, 31);
+        """)
 
         # Główny nagłówek - dopasowany do stylu nagłówka SUDOKU z głównego okna
         tytul = QLabel("RANKING")
@@ -82,7 +88,7 @@ class RankingOkno(QDialog):
         # Tworzymy panel z zakładkami
         self.zakladki = QTabWidget()
         self.zakladki.setStyleSheet("""
-            QTabWidget { qproperty-elideMode: "ElideNone"; }
+            QTabWidget { qproperty-elideMode: ElideNone; }
             QTabWidget::panel { 
                 border: 1px solid rgb(226, 232, 240); 
                 background: rgb(255, 255, 255); 
@@ -128,7 +134,7 @@ class RankingOkno(QDialog):
             tabela.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
             tabela.horizontalHeader().setMinimumSectionSize(50)
             tabela.horizontalHeader().setDefaultSectionSize(50)
-
+            tabela.verticalHeader().setVisible(False)
             tabela.setEditTriggers(QAbstractItemView.NoEditTriggers)
             tabela.setStyleSheet("""
                 QTableWidget { 
@@ -187,3 +193,80 @@ class RankingOkno(QDialog):
                 tabela.setItem(index, 1, item_gracz)
                 tabela.setItem(index, 2, item_czas)
             tabela.resizeRowsToContents()
+
+
+def gra_zakonczona_sukcesem(okno_startowe, czas_startu):
+    """
+    Funkcja wywoływana w momencie, gdy gracz poprawnie ułoży całe Sudoku.
+
+    Argumenty:
+        okno_startowe: referencja do Twojego głównego okna (GlowneOkno),
+                       z którego pobieramy imię i poziom trudności.
+        czas_startu: wartość zapisana na początku gry przez timeit.default_timer()
+    """
+    # 1. Zatrzymanie stopera (timeit) i wyliczenie pełnych sekund
+    czas_konca = timeit.default_timer()
+    laczny_czas_sekundy = int(czas_konca - czas_startu)
+
+    # 2. Pobranie imienia wpisanego przez gracza
+    imie_gracza = okno_startowe.lineedit_nazwa_swoja.text().strip()
+    if not imie_gracza:
+        imie_gracza = "Anonim"
+
+    # 3. Odczytanie, który poziom trudności był zaznaczony
+    if okno_startowe.radio_latwy.isChecked():
+        wybrany_poziom = "Łatwy"
+    elif okno_startowe.radio_trudny.isChecked():
+        wybrany_poziom = "Trudny"
+    else:
+        wybrany_poziom = "Średni"
+
+    # Aktualizacja danych do tabeli
+    manager_rankingu = RankingManager()
+    manager_rankingu.dodaj_wynik(imie_gracza, wybrany_poziom, laczny_czas_sekundy)
+
+    # 5. Stworzenie i pokazanie nowego okna z tabelą wyników
+    okno_wynikow = RankingOkno(manager_rankingu, domyslny_poziom=wybrany_poziom)
+    okno_wynikow.exec_()
+
+
+
+# SZYBKI TEST OKNA RANKINGU 
+
+if __name__ == "__main__":
+    import sys
+    from PyQt5.QtWidgets import QApplication
+
+    # 1. Inicjalizacja aplikacji PyQt5 (wymagana do wyświetlenia okna)
+    app = QApplication(sys.argv)
+    app.setStyle("Fusion")
+
+    # 2. Tworzymy menedżera rankingu
+    manager_testowy = RankingManager()
+
+    # 3. Podkładamy sztuczne dane testowe (Imie, Poziom, Czas w sekundach)
+    # Poziom Łatwy
+    manager_testowy.dodaj_wynik("Ania", "Łatwy", 45)  # 00:45 (najlepszy)
+    manager_testowy.dodaj_wynik("Tomek", "Łatwy", 125)  # 02:05
+    manager_testowy.dodaj_wynik("Kasia", "Łatwy", 90)  # 01:30
+
+    # Poziom Średni
+    manager_testowy.dodaj_wynik("Hania", "Średni", 310)  # 05:10
+    manager_testowy.dodaj_wynik("Janek", "Średni", 180)  # 03:00 (najlepszy)
+    manager_testowy.dodaj_wynik("Hania", "Średni", 250)  # Test nadpisywania
+
+    # Poziom Trudny
+    manager_testowy.dodaj_wynik("MistrzSudoku", "Trudny", 605)  # 10:05
+    manager_testowy.dodaj_wynik("Piotr", "Trudny", 720)  # 12:00
+
+    # 4. Odpalamy okno i każemy mu domyślnie pokazać poziom "Średni"
+    okno_testowe = RankingOkno(manager_testowy, domyslny_poziom="Średni")
+    okno_testowe.show()
+
+    # 5. Zamknięcie programu po wyjściu z okna
+    sys.exit(app.exec_())
+
+
+
+
+
