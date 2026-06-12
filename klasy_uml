@@ -1,1 +1,158 @@
+@startuml SudokuFullDiagram
+set namespaceSeparator none
 
+
+- KLASY GŁÓWNEJ GRY
+
+
+class "SudokuCell" as SudokuCell {
+  fokus_otrzymany
+  row
+  col
+  glowne_okno
+  wartosc
+  notatki
+  wygenerowane
+
+  __init__(row, col, glowne_okno, parent=None)
+  focusInEvent(event)
+  keyPressEvent(event)
+  ustaw_poczatkowa(val)
+  odswiez_tekst()
+}
+
+class "GlowneOkno" as GlowneOkno {
+  stos_ekranow
+  ekran_menu
+  ekran_gry
+  lineedit_nazwa_swoja
+  radio_latwy
+  radio_sredni
+  radio_trudny
+  przycisk_start
+  checkbox_notatki
+  siatka_gry
+  komorki
+  akt_wiersz
+  akt_kolumna
+
+  __init__()
+  initUI()
+  initGraUI()
+  uruchom_gre()
+  ustaw_styl_komorki(komorka, r, c, kolor_tla)
+  odswiez_obecne_podswietlenie()
+  podswietl_obszary(klik_wiersz, klik_kolumna)
+}
+
+class "Board" as Board {
+  board
+  generateQuestionBoardCode(trudnosc)
+}
+
+
+
+- KLASY RANKINGU
+
+
+class "RankingManager" as RankingManager {
+  plik_bazy
+  wyniki
+
+  __init__(plik_bazy="ranking.json")
+  wczytaj_ranking()
+  zapisz_ranking()
+  dodaj_wynik(imie, poziom, czas_sekundy)
+  pobierz_posortowany_ranking(poziom)
+}
+
+class "RankingOkno" as RankingOkno {
+  manager
+  domyslny_poziom
+  tabele_widzety
+  zakladki
+
+  __init__(manager, domyslny_poziom="Średni", parent=None)
+  initUI()
+  formatuj_czas(sekundy)
+  odswiez_wszystkie_tabele()
+}
+
+class "FunkcjePomocnicze" as FunkcjePomocnicze <<utility>> {
+  rgb(r, g, b)
+  gra_zakonczona_sukcesem(okno_startowe, czas_startu)
+}
+
+
+
+- KLASY PyQt5
+
+
+class "QLineEdit" as QLineEdit
+class "QMainWindow" as QMainWindow
+class "QDialog" as QDialog
+class "QStackedWidget" as QStackedWidget
+class "QWidget" as QWidget
+class "QGridLayout" as QGridLayout
+class "QVBoxLayout" as QVBoxLayout
+class "QHBoxLayout" as QHBoxLayout
+class "QLabel" as QLabel
+class "QGroupBox" as QGroupBox
+class "QRadioButton" as QRadioButton
+class "QPushButton" as QPushButton
+class "QCheckBox" as QCheckBox
+class "QTabWidget" as QTabWidget
+class "QTableWidget" as QTableWidget
+class "QTableWidgetItem" as QTableWidgetItem
+
+
+
+- DZIEDZICZENIE
+
+SudokuCell --|> QLineEdit
+GlowneOkno --|> QMainWindow
+RankingOkno --|> QDialog
+
+
+
+- RELACJE GŁÓWNEJ GRY
+
+GlowneOkno *-- QStackedWidget : stos_ekranow
+GlowneOkno *-- QWidget : ekran_menu
+GlowneOkno *-- QWidget : ekran_gry
+GlowneOkno *-- QGridLayout : siatka_gry
+GlowneOkno *-- "81" SudokuCell : komorki
+
+SudokuCell --> GlowneOkno : glowne_okno
+
+GlowneOkno ..> Board : tworzy planszę
+GlowneOkno ..> QLabel : używa
+GlowneOkno ..> QGroupBox : używa
+GlowneOkno ..> QRadioButton : poziom trudności
+GlowneOkno ..> QPushButton : przyciski
+GlowneOkno ..> QCheckBox : tryb notatek
+GlowneOkno ..> QVBoxLayout : używa
+GlowneOkno ..> QHBoxLayout : używa
+
+
+- RELACJE RANKINGU
+
+RankingOkno --> RankingManager : manager
+RankingOkno *-- QTabWidget : zakladki
+RankingOkno *-- QTableWidget : tabele_widzety
+RankingOkno ..> QTableWidgetItem : tworzy elementy tabeli
+RankingOkno ..> QLabel : tytuł
+RankingOkno ..> QWidget : zakładki
+RankingOkno ..> QVBoxLayout : layout
+
+RankingManager ..> "ranking.json" : zapis / odczyt wyników
+
+
+
+- POWIĄZANIE GRY Z RANKINGIEM
+
+FunkcjePomocnicze ..> GlowneOkno : pobiera imię i poziom
+FunkcjePomocnicze ..> RankingManager : tworzy i dodaje wynik
+FunkcjePomocnicze ..> RankingOkno : pokazuje ranking
+
+@enduml
