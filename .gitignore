@@ -1,0 +1,13 @@
+# Tymczasowe pliki i foldery Pythona
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Wirtualne środowiska (jeśli ktoś z grupy ich używa)
+venv/
+env/
+.env
+
+# Pliki konfiguracyjne samego VS Code (żeby nie nadpisywać sobie ustawień edytora)
+.vscode/

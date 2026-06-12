@@ -1,5 +1,7 @@
 import sys
-from generator import Board  # Łączymy się z Twoim pierwszym plikiem!
+import timeit
+from generator import Board 
+from Ranking_czasów import RankingManager, RankingOkno  # Importujemy kod koleżanki!
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (
@@ -30,9 +32,8 @@ class SudokuCell(QLineEdit):
         self.setAlignment(Qt.AlignCenter)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
-        # Powiększone domyślne limity, żeby plansza była odpowiednio duża na Twoim monitorze!
-        self.setMinimumSize(180, 180)
-        self.setMaximumSize(250, 250) 
+        self.setMinimumSize(80, 80)
+        self.setMaximumSize(150, 150) 
 
         self.setReadOnly(True)
         self.setCursor(Qt.ArrowCursor)
@@ -55,12 +56,9 @@ class SudokuCell(QLineEdit):
                 self.wartosc = "" 
             else:
                 self.wartosc = klawisz
-                # USUNIĘTO: self.notatki.clear() - dzięki temu notatki zostają w pamięci!
         
-        # Kasowanie (Backspace / Delete)
         elif event.key() in (Qt.Key_Backspace, Qt.Key_Delete, Qt.Key_Space):
             self.wartosc = ""
-            # USUNIĘTO: self.notatki.clear() - dzięki temu Backspace odkrywa notatki z powrotem!
         else:
             super().keyPressEvent(event)
             return
@@ -101,6 +99,8 @@ class GlowneOkno(QMainWindow):
         
         self.stos_ekranow = QStackedWidget()
         self.setCentralWidget(self.stos_ekranow)
+        
+        self.czas_startu = 0 # Zmienna do trzymania czasu
         
         self.initUI()      
         self.initGraUI()   
@@ -215,14 +215,7 @@ class GlowneOkno(QMainWindow):
         lewy_panel = QVBoxLayout()
         przycisk_wroc = QPushButton("Wróć do Menu")
         przycisk_wroc.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {rgb(30, 41, 59)};
-                color: white;
-                font-size: 18px;
-                font-weight: bold;
-                padding: 15px 25px;
-                border-radius: 10px;
-            }}
+            QPushButton {{ background-color: {rgb(30, 41, 59)}; color: white; font-size: 18px; font-weight: bold; padding: 15px 25px; border-radius: 10px; }}
             QPushButton:hover {{ background-color: {rgb(51, 65, 85)}; }}
         """)
         przycisk_wroc.clicked.connect(lambda: self.stos_ekranow.setCurrentWidget(self.ekran_menu))
@@ -230,17 +223,20 @@ class GlowneOkno(QMainWindow):
         
         self.checkbox_notatki = QCheckBox("Tryb Notatek")
         self.checkbox_notatki.setStyleSheet(f"""
-            QCheckBox {{
-                font-family: 'Segoe UI';
-                font-size: 20px;
-                font-weight: bold;
-                color: {rgb(30, 41, 59)};
-                margin-top: 30px;
-            }}
+            QCheckBox {{ font-family: 'Segoe UI'; font-size: 20px; font-weight: bold; color: {rgb(30, 41, 59)}; margin-top: 30px; }}
             QCheckBox::indicator {{ width: 25px; height: 25px; }}
         """)
         lewy_panel.addWidget(self.checkbox_notatki)
         
+        # --- DODANE: Przycisk testowy kończący grę ---
+        self.przycisk_zakoncz = QPushButton("ZAKOŃCZ GRĘ\n(Test Rankingu)")
+        self.przycisk_zakoncz.setStyleSheet(f"""
+            QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
+            QPushButton:hover {{ background-color: rgb(185, 28, 28); }}
+        """)
+        self.przycisk_zakoncz.clicked.connect(self.zakoncz_gre)
+        lewy_panel.addWidget(self.przycisk_zakoncz)
+
         lewy_panel.addStretch() 
         layout_glowny_gry.addLayout(lewy_panel)
 
@@ -272,6 +268,9 @@ class GlowneOkno(QMainWindow):
         self.stos_ekranow.addWidget(self.ekran_gry)
 
     def uruchom_gre(self):
+        # 1. ZACZYNAMY MIERZYĆ CZAS!
+        self.czas_startu = timeit.default_timer()
+
         trudnosc = 1 
         if self.radio_latwy.isChecked(): trudnosc = 0
         elif self.radio_trudny.isChecked(): trudnosc = 2
@@ -289,6 +288,28 @@ class GlowneOkno(QMainWindow):
 
         self.stos_ekranow.setCurrentWidget(self.ekran_gry)
 
+    def zakoncz_gre(self):
+        """Funkcja wywoływana po wygranej (lub kliknięciu przycisku testowego)"""
+        # Obliczamy czas od wciśnięcia "Rozpocznij"
+        czas_konca = timeit.default_timer()
+        laczny_czas = int(czas_konca - self.czas_startu)
+
+        # Pobieramy wpisane dane
+        imie = self.lineedit_nazwa_swoja.text().strip()
+        if not imie: 
+            imie = "Anonim"
+
+        if self.radio_latwy.isChecked(): poziom = "Łatwy"
+        elif self.radio_trudny.isChecked(): poziom = "Trudny"
+        else: poziom = "Średni"
+
+        # TWORZYMY OBIEKTY Z KODU KOLEŻANKI
+        manager_rankingu = RankingManager()
+        manager_rankingu.dodaj_wynik(imie, poziom, laczny_czas)
+
+        okno_wynikow = RankingOkno(manager_rankingu, domyslny_poziom=poziom, parent=self)
+        okno_wynikow.exec_() # Wyświetlamy jej tabelę
+
     def ustaw_styl_komorki(self, komorka, r, c, kolor_tla):
         top = "3px solid black" if r % 3 == 0 else "1px solid #cbd5e1"
         left = "3px solid black" if c % 3 == 0 else "1px solid #cbd5e1"
@@ -297,17 +318,17 @@ class GlowneOkno(QMainWindow):
 
         if komorka.wygenerowane:
             kolor_tekstu = "black"       
-            rozmiar = "50px"
+            rozmiar = "36px"
         else:
             if komorka.wartosc:     
                 kolor_tekstu = "#0284c7"     
-                rozmiar = "50px"
+                rozmiar = "36px"
             elif komorka.notatki:   
                 kolor_tekstu = "#64748b" 
-                rozmiar = "25px"
+                rozmiar = "14px"
             else:                   
                 kolor_tekstu = "black"
-                rozmiar = "50px"
+                rozmiar = "36px"
 
         komorka.setStyleSheet(f"""
             QLineEdit {{
@@ -346,12 +367,3 @@ class GlowneOkno(QMainWindow):
                     self.ustaw_styl_komorki(komorka, wiersz, kolumna, "#e0f2fe") 
                 else:
                     self.ustaw_styl_komorki(komorka, wiersz, kolumna, "white") 
-
-def main():
-    aplikacja = QApplication(sys.argv)
-    glowne_okno = GlowneOkno()
-    glowne_okno.show()
-    sys.exit(aplikacja.exec())
-
-if __name__ == "__main__":
-    main()
