@@ -1,7 +1,39 @@
 import copy
 import random
-
+import pygame
 class Board:
+    def isSolved(self):
+        # brak pustych pól
+        for row in range(9):
+            for col in range(9):
+                if self.board[row][col] == 0:
+                    return False
+
+        # brak błędów
+        if len(self.getErrors()) > 0:
+            return False
+
+        return True
+    def getErrors(self):
+        errors = set()
+
+        for row in range(9):
+            for col in range(9):
+                num = self.board[row][col]
+
+                if num == 0:
+                    continue
+
+                # tymczasowo usuwamy liczbę
+                self.board[row][col] = 0
+
+                if not self.checkSpace(num, (row, col)):
+                    errors.add((row, col))
+
+                # przywracamy
+                self.board[row][col] = num
+
+        return errors
     def __init__(self, code=None):
         self.__resetBoard()
 
@@ -241,12 +273,125 @@ class Board:
 if __name__ == "__main__":
     board = Board()
 
-    question_board_code = board.generateQuestionBoardCode(1)
+    question_board_code = board.generateQuestionBoardCode(0)
+
 
     print("CODE (string):")
     print(question_board_code[0])
 
     print("\nBOARD (2D):")
     board.printBoard()
+    fixed_cells = set()
+
+    for row in range(9):
+        for col in range(9):
+            if board.board[row][col] != 0:
+                fixed_cells.add((row, col))
+WIDTH = 540
+HEIGHT = 540
+CELL_SIZE = WIDTH // 9
+
+pygame.init()
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Sudoku")
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (100, 150, 255)
+font = pygame.font.SysFont(None, 40)
+won = False
+running = True
+selected = None
+while running:
+    errors = board.getErrors()
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            running = False
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+
+            col = mouse_x // CELL_SIZE
+            row = mouse_y // CELL_SIZE
+
+            selected = (row, col)
+
+        elif event.type == pygame.KEYDOWN and selected:
+            row, col = selected
+
+            if (row, col) not in fixed_cells:
+
+                if pygame.K_1 <= event.key <= pygame.K_9:
+                    board.board[row][col] = event.key - pygame.K_0
+
+                elif event.key in (pygame.K_BACKSPACE, pygame.K_DELETE, pygame.K_0):
+                    board.board[row][col] = 0
+    if not won and board.isSolved():
+        won = True
+    screen.fill(WHITE)
+    if selected:
+        row, col = selected
+
+        pygame.draw.rect(
+            screen,
+            BLUE,
+            (
+                col * CELL_SIZE,
+                row * CELL_SIZE,
+                CELL_SIZE,
+                CELL_SIZE
+            )
+        )
+    # liczby
+    for row in range(9):
+        for col in range(9):
+            value = board.board[row][col]
+
+            if value != 0:
+                x = col * CELL_SIZE + CELL_SIZE // 2
+                y = row * CELL_SIZE + CELL_SIZE // 2
+
+                if (row, col) in errors:
+                    color = (220, 50, 50)  # czerwony = błąd
+                else:
+                    color = BLACK
+
+                text = font.render(str(value), True, color)
+                text_rect = text.get_rect(center=(x, y))
+                screen.blit(text, text_rect)
+
+    # linie siatki
+    for i in range(10):
+        width = 3 if i % 3 == 0 else 1
+
+        pygame.draw.line(screen, BLACK,
+                         (0, i * CELL_SIZE),
+                         (WIDTH, i * CELL_SIZE), width)
+
+        pygame.draw.line(screen, BLACK,
+                         (i * CELL_SIZE, 0),
+                         (i * CELL_SIZE, HEIGHT), width)
+
+    # WIN overlay
+    if won:
+        overlay = pygame.Surface((WIDTH, HEIGHT))
+        overlay.set_alpha(180)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+
+        win_text = font.render("YOU WIN!", True, (0, 255, 0))
+        text_rect = win_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(win_text, text_rect)
+    pygame.display.flip()
+pygame.quit()
+if __name__ == "__main__":
+    board = Board()
+    board.generateQuestionBoardCode(1)
+
+
+
+
 
 
