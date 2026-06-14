@@ -120,6 +120,23 @@ Aby otworzyć projekt w Visual Studio Code:
 python main.py
 ```
 
+## Instrukcja użytkowania
+Zacznij od uruchomienia gry, tak jak zostało to przedstawione w poprzednim kroku. Zobaczysz interfejs z okienkiem na twoje imię, a także poziomem trudności do wyboru, zdecyduj jaki poziom trudności tobie odpowiada, łatwy, średni czy trudny. Kliknij start i odpal planszę.
+
+Gra polega na uzupełnianiu siatki cyframi od 1 do 9. Aby poprawnie ją wypełnić kieruj się tymi zasadami:
+
+W każdym rzędzie muszą znaleźć się cyfry od 1 do 9. Żadna cyfra nie może się powtórzyć – jeśli w rzędzie jest już np. 4, to druga czwórka w tym samym rzędzie jest błędem.
+
+Dokładnie to samo dotyczy pionu. W każdej z 9 pionowych kolumn muszą wystąpić cyfry od 1 do 9, każda dokładnie jeden raz.
+
+Cała plansza jest podzielona liniami na 9 mniejszych kwadratów o wymiarach 3×3 pola. Wewnątrz każdego takiego małego kwadratu również muszą znaleźć się wszystkie cyfry od 1 do 9, bez powtórzeń.
+
+Podczas wpisywania musisz uważać, bo masz limit maksymalnie dwóch błędów. Trzecia pomyłka oznacza automatyczną przegraną i koniec zabawy. W trakcie gry masz opcję notatek. Możesz zaznaczyć okienko po lewej stronie planszy, a twoje cyfry wpiszą się "na brudno", jako małe cyfry w rogach okienek, co ułatwi ci grę.
+
+Gdy uda Ci się poprawnie zapełnić ostatnie wolne pole, gra się zakończy. Zobaczysz swój końcowy czas w okienku z rankingiem, gdzie możesz porównać wynik z osiągnięciami innych graczy.
+
+Jeżeli w jakimkolwiek momencie chcesz zakończyć rozgrywkę, możesz kliknąć krzyżyk w prawym górnym rogu, lub przycisk „Zakończ grę”.
+
 
 
 
