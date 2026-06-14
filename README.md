@@ -15,3 +15,86 @@ Do wykonania projektu planujemy wykorzystać kilka bibliotek Pythona. Biblioteka
 ### Faza 2
 
 W drugiej fazie projektu skupimy się na przekształceniu podstawowej wersji gry w pełni stabilną, zaawansowaną i dopracowaną aplikację, koncentrując działania na rozbudowie interfejsu, kontroli jakości oraz finalnej integracji kodu. Ponieważ nasz program posiada już działającą funkcję notatek, w tym etapie skupimy się na podniesieniu czytelności i przejrzystości gry poprzez dodanie specjalnego opisu po boku ekranu, który w prosty sposób wyjaśni graczowi zasadę działania tego mechanizmu podczas rozgrywki. Ważnym krokiem w rozwoju interfejsu użytkownika będzie również wprowadzenie opcji językowych, dzięki czemu gracz będzie mógł swobodnie przełączać aplikację między językiem polskim, angielskim oraz ukraińskim. Dodatkowo, aby ułatwić rozgrywkę, zaimplementujemy opcję podpowiedzi, która w trakcie gry będzie mogła wskazać właściwą cyfrę. Będziemy także udoskonalać diagram UML, co pozwoli dokładniej odwzorować relacje między klasami, grafiką a strukturą danych po wprowadzeniu wszystkich nowych funkcjonalności. Aby zagwarantować niezawodność aplikacji, stworzymy kompleksowy zestaw testów, wykorzystamy tradycyjne testy funkcji do bezpośredniego zweryfikowania poprawności działania algorytmów, a także testy typu Mock, które pozwolą nam zasymulować zachowanie trudniejszych komponentów, takich jak operacje zapisu na dysku czy interakcje z interfejsem graficznym. Pozwoli to na sprawną identyfikację i poprawę wszelkich niedoskonałości programu, optymalizację płynności działania okna gry oraz eliminację błędów, takich jak niepoprawna obsługa znaków czy problemy z zapisem bazy danych. Na koniec przeprowadzimy końcowe połączenie wszystkich kodów w repozytorium Git, rozwiązując ewentualne konflikty powstałe podczas pracy w grupie, co pozwoli scalić grafikę, logikę oraz system rankingowy w jedną, spójną i poprawnie działającą całość.
+
+
+
+
+
+## Instrukcja uruchomienia gry
+### 1. Wymagania
+Przed uruchomieniem projektu należy zainstalować:
+-	Python 3.13
+-	Git
+-	Visual Studio Code lub inny edytor kodu
+Sudoku korzysta z bibliotek PyQt5 oraz pygame, dlatego zalecamy użycie Pythona 3.13.
+Aby sprawdzić, czy Python jest zainstalowany, wpisz w terminalu:
+**Windows**
+ 	``bash
+ 	py --version
+ 	``
+**macOS**
+ 	``bash
+ 	python3 --version
+ 	``
+ 	Aby sprawdzić, czy Git jest zainstalowany:
+ 	``bash
+ 	git --version
+ 	``
+ 	### 2. Pobranie projektu z GitHuba
+ 	Otwórz terminal i wpisz:
+ 	``bash
+ 	git clone https://github.com/Maria6029/aplikacja.git
+ 	``
+ 	Następnie wejdź do folderu projektu:
+ 	``bash
+ 	cd aplikacja
+ 	``
+ 	### 3. Utworzenie środowiska wirtualnego
+ 	**Windows**
+ 	``bash
+ 	py -3.13 -m venv .venv
+ 	``
+ 	Aktywacja środowiska:
+ 	``bash
+ 	.venv\Scripts\activate
+ 	``
+ 	**macOS**
+ 	``bash
+ 	python3.13 -m venv .venv
+ 	``
+ 	Aktywacja środowiska:
+ 	``bash
+ 	source .venv/bin/activate
+ 	``
+ 	Po aktywacji środowiska w terminalu powinna pojawić się nazwa .venv.
+ 	### 4. Instalacja wymaganyc bibliotek
+ 	``bash
+ 	python -m pip install PyQt5 PyQt5-sip pygame
+ 	``
+ 	### 5. Uruchomienie gry
+ 	``bash
+ 	python main.py
+ 	``
+
+
+
+
+
+
+  
+ 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+ 	
