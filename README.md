@@ -24,7 +24,8 @@ W trzeciej, finałowej fazie projektu skoncentrujemy się na wielojęzyczności,
 
 Zadbamy o pełną dokumentację techniczną, aktualizując diagram UML o nowo powstałe relacje między klasami. Stworzymy kompleksowy zestaw testów: klasyczne testy jednostkowe do weryfikacji algorytmów (np. generatora planszy) oraz testy typu Mock, symulujące bardziej złożone operacje, takie jak zapis rankingu do pliku czy interakcje z GUI. Całość zwieńczymy ogólnym dopracowaniem kodu, wyłapywaniem i naprawianiem błędów, co zapewni płynność i stabilność finalnej wersji gry.
 
-
+### Biblioteki w Fazie 2
+W fazie implementacji prototypu rozszerzyliśmy początkowy zestaw narzędzi o bibliotekę PyQt5, która przejęła rolę zaawansowanego interfejsu (obsługa menu, tabel i zakładek w oknie rankingu), podczas gdy Pygame odpowiada bezpośrednio za interaktywne renderowanie samej planszy Sudoku i obsługę mechaniki rozgrywki. Do zarządzania logiczną strukturą gry wykorzystaliśmy moduł random do losowania układów planszy oraz copy do bezpiecznego klonowania jej stanów. Trwałość danych i stabilność aplikacji zapewniają moduły json (strukturyzowany zapis wyników graczy) oraz os (bezpieczna weryfikacja istnienia plików na dysku), z kolei za precyzyjne odmierzanie czasu rozgrywki odpowiada timeit. Natomiast biblioteka sys gwarantuje poprawne zamykanie wszystkich procesów aplikacji.
 
 
 ## Instrukcja uruchomienia gry 
