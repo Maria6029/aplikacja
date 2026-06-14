@@ -27,54 +27,56 @@ Przed uruchomieniem projektu należy zainstalować:
 -	Git
 -	Visual Studio Code lub inny edytor kodu
 Sudoku korzysta z bibliotek PyQt5 oraz pygame, dlatego zalecamy użycie Pythona 3.13.
+
 Aby sprawdzić, czy Python jest zainstalowany, wpisz w terminalu:
+
 **Windows**
- 	``bash
- 	py --version
- 	``
+ ```bash
+ py --version
+ ```
 **macOS**
- 	``bash
- 	python3 --version
- 	``
- 	Aby sprawdzić, czy Git jest zainstalowany:
- 	``bash
- 	git --version
- 	``
- 	### 2. Pobranie projektu z GitHuba
- 	Otwórz terminal i wpisz:
- 	``bash
- 	git clone https://github.com/Maria6029/aplikacja.git
- 	``
- 	Następnie wejdź do folderu projektu:
- 	``bash
- 	cd aplikacja
- 	``
- 	### 3. Utworzenie środowiska wirtualnego
- 	**Windows**
- 	``bash
- 	py -3.13 -m venv .venv
- 	``
- 	Aktywacja środowiska:
- 	``bash
- 	.venv\Scripts\activate
- 	``
- 	**macOS**
- 	``bash
- 	python3.13 -m venv .venv
- 	``
- 	Aktywacja środowiska:
- 	``bash
- 	source .venv/bin/activate
- 	``
- 	Po aktywacji środowiska w terminalu powinna pojawić się nazwa .venv.
- 	### 4. Instalacja wymaganyc bibliotek
- 	``bash
- 	python -m pip install PyQt5 PyQt5-sip pygame
- 	``
- 	### 5. Uruchomienie gry
- 	``bash
- 	python main.py
- 	``
+ ```bash
+ python3 --version
+ ```
+Aby sprawdzić, czy Git jest zainstalowany:
+ ```bash
+ git --version
+ ```
+ ### 2. Pobranie projektu z GitHuba
+ Otwórz terminal i wpisz:
+ ```bash
+ git clone https://github.com/Maria6029/aplikacja.git
+ ```
+ Następnie wejdź do folderu projektu:
+ ```bash
+ cd aplikacja
+ ```
+ ### 3. Utworzenie środowiska wirtualnego
+ **Windows**
+ ```bash
+ py -3.13 -m venv .venv
+ ```
+ Aktywacja środowiska:
+ ```bash
+  venv\Scripts\activate
+ ```
+ **macOS**
+ ```bash
+ python3.13 -m venv .venv
+ ```
+ Aktywacja środowiska:
+ ```bash
+ source .venv/bin/activate
+ ```
+ Po aktywacji środowiska w terminalu powinna pojawić się nazwa .venv.
+ ### 4. Instalacja wymaganyc bibliotek
+ ```bash
+	python -m pip install PyQt5 PyQt5-sip pygame
+```
+ ### 5. Uruchomienie gry
+ ```bash
+ python main.py
+ ```
 
 
 
