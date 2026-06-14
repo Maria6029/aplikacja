@@ -11,3 +11,4 @@ env/
 
 # Pliki konfiguracyjne samego VS Code (żeby nie nadpisywać sobie ustawień edytora)
 .vscode/
+.venv/
