@@ -3,7 +3,7 @@ set namespaceSeparator none
 
 skinparam classAttributeIconSize 0
 
-- KLASY GŁÓWNEJ GRY
+' --- KLASY GŁÓWNEJ GRY ---
 
 class "SudokuCell" as SudokuCell {
   + fokus_otrzymany : pyqtSignal
@@ -84,7 +84,7 @@ class "Board" as Board {
   - __findSpacesToFindNumberOfSolutions(board, h)
 }
 
-- KLASY RANKINGU 
+' --- KLASY RANKINGU ---
 
 class "RankingManager" as RankingManager {
   + plik_bazy : str
@@ -113,7 +113,7 @@ class "FunkcjePomocnicze" as FunkcjePomocnicze <<utility>> {
   + rgb(r, g, b) : str
 }
 
-- KLASY PyQt5 (Zewnętrzne) 
+' --- KLASY PyQt5 (Zewnętrzne) ---
 
 class "QLineEdit" as QLineEdit
 class "QMainWindow" as QMainWindow
@@ -133,13 +133,13 @@ class "QTableWidget" as QTableWidget
 class "QTableWidgetItem" as QTableWidgetItem
 class "QTimer" as QTimer
 
-- DZIEDZICZENIE 
+' --- DZIEDZICZENIE ---
 
 SudokuCell --|> QLineEdit
 GlowneOkno --|> QMainWindow
 RankingOkno --|> QDialog
 
-- RELACJE GŁÓWNEJ GRY
+' --- RELACJE GŁÓWNEJ GRY ---
 
 GlowneOkno *-- QStackedWidget : stos_ekranow
 GlowneOkno *-- QWidget : ekran_menu
@@ -160,7 +160,7 @@ GlowneOkno ..> QCheckBox : tryb notatek
 GlowneOkno ..> QVBoxLayout : używa
 GlowneOkno ..> QHBoxLayout : używa
 
-- RELACJE RANKINGU 
+' --- RELACJE RANKINGU ---
 
 RankingOkno --> RankingManager : manager
 RankingOkno *-- QTabWidget : zakladki
@@ -172,7 +172,7 @@ RankingOkno ..> QVBoxLayout : layout
 
 RankingManager ..> "ranking.json" : zapis / odczyt wyników
 
-- POWIĄZANIE GRY Z RANKINGIEM 
+' --- POWIĄZANIE GRY Z RANKINGIEM ---
 
 GlowneOkno ..> RankingManager : tworzy i wywołuje w celu zapisu wyniku
 GlowneOkno ..> RankingOkno : tworzy i wyświetla modalnie po zakończeniu gry
