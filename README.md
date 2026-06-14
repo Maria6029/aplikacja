@@ -27,65 +27,98 @@ Zadbamy o pełną dokumentację techniczną, aktualizując diagram UML o nowo po
 
 
 
-## Instrukcja uruchomienia gry
-### 1. Wymagania
-Przed uruchomieniem projektu należy zainstalować:
--	Python 3.13
--	Git
--	Visual Studio Code lub inny edytor kodu
-Sudoku korzysta z bibliotek PyQt5 oraz pygame, dlatego zalecamy użycie Pythona 3.13.
+## Instrukcja uruchomienia gry 
+### 1. Wymagania 
+Przed uruchomieniem projektu należy zainstalować: 
+- Python 3.13
+- Git
+- Visual Studio Code lub inny edytor kodu — opcjonalnie
 
-Aby sprawdzić, czy Python jest zainstalowany, wpisz w terminalu:
+Sudoku korzysta z bibliotek **PyQt5** oraz **pygame**, dlatego zalecamy użycie **Pythona 3.13**.
 
-**Windows**
- ```bash
- py --version
- ```
-**macOS**
- ```bash
- python3 --version
- ```
-Aby sprawdzić, czy Git jest zainstalowany:
- ```bash
- git --version
- ```
- ### 2. Pobranie projektu z GitHuba
- Otwórz terminal i wpisz:
- ```bash
- git clone https://github.com/Maria6029/aplikacja.git
- ```
- Następnie wejdź do folderu projektu:
- ```bash
- cd aplikacja
- ```
- ### 3. Utworzenie środowiska wirtualnego
- **Windows**
- ```bash
- py -3.13 -m venv .venv
- ```
- Aktywacja środowiska:
- ```bash
-  venv\Scripts\activate
- ```
- **macOS**
- ```bash
- python3.13 -m venv .venv
- ```
- Aktywacja środowiska:
- ```bash
- source .venv/bin/activate
- ```
- Po aktywacji środowiska w terminalu powinna pojawić się nazwa .venv.
- ### 4. Instalacja wymaganyc bibliotek
- ```bash
-	python -m pip install PyQt5 PyQt5-sip pygame
+Aby sprawdzić, czy Python jest zainstalowany, wpisz w terminalu: 
+
+**Windows** 
+```bash
+py --version
 ```
- ### 5. Uruchomienie gry
- ```bash
+**macOS** 
+```bash
+python3.13 --version
+```
+**Linux** 
+```bash
+python3.13 --version
+```
+Aby sprawdzić, czy Git jest zainstalowany: 
+```bash
+git --version
+```
+### 2. Pobranie projektu z GitHuba 
+
+Otwórz terminal i wpisz: 
+```bash
+git clone https://github.com/Maria6029/aplikacja.git
+```
+Następnie wejdź do folderu projektu: 
+```bash
+cd aplikacja 
+```
+### 3. Utworzenie środowiska wirtualnego 
+**Windows** 
+```bash 
+py -3.13 -m venv .venv
+```
+Aktywacja środowiska:
+```bash
+.\.venv\Scripts\activate
+```
+**macOS** 
+```bash 
+python3.13 -m venv .venv
+```
+Aktywacja środowiska:
+```bash
+source .venv/bin/activate
+```
+**Linux** 
+```bash 
+python3.13 -m venv .venv
+```
+Aktywacja środowiska: 
+```bash 
+source .venv/bin/activate
+```
+Po aktywacji środowiska w terminalu powinna pojawić się nazwa `.venv`. 
+### 4. Instalacja wymaganych bibliotek 
+W aktywnym środowisku wirtualnym wpisz: 
+```bash 
+python -m pip install PyQt5 PyQt5-sip pygame
+```
+ ### 5. Uruchomienie gry Aby uruchomić grę, wpisz: 
+ ```bash 
  python main.py
- ```
-
-
+```
+### Najczęstsze problemy #### 
+Problem z aktywacją środowiska wirtualnego na Windowsie 
+Jeśli pojawi się problem z aktywacją środowiska wirtualnego, należy wpisać w PowerShell: 
+```bash 
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+Jeśli system zapyta o potwierdzenie, wpisz `Y` lub `T` i naciśnij Enter. Następnie ponownie aktywuj środowisko: 
+```bash
+.\.venv\Scripts\activate
+```
+### Opcjonalnie: otwarcie projektu w Visual Studio Code
+Aby otworzyć projekt w Visual Studio Code: 
+1. Uruchom Visual Studio Code.
+2. Wybierz **File**, a później **Open Folder**.
+3. Wskaż folder **aplikacja**.
+4. Otwórz terminal: **Terminal**, a później **New Terminal**.
+5. Wykonaj komendy z instrukcji, czyli aktywuj środowisko, zainstaluj biblioteki i uruchom grę:
+```bash
+python main.py
+```
 
 
 
