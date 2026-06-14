@@ -1,98 +1,119 @@
-@startuml SudokuFullDiagram
+@startuml SudokuFullDiagram_Final
 set namespaceSeparator none
 
+skinparam classAttributeIconSize 0
 
 - KLASY GŁÓWNEJ GRY
 
-
 class "SudokuCell" as SudokuCell {
-  fokus_otrzymany
-  row
-  col
-  glowne_okno
-  wartosc
-  notatki
-  wygenerowane
-
-  __init__(row, col, glowne_okno, parent=None)
-  focusInEvent(event)
-  keyPressEvent(event)
-  ustaw_poczatkowa(val)
-  odswiez_tekst()
+  + fokus_otrzymany : pyqtSignal
+  + row : int
+  + col : int
+  + glowne_okno : GlowneOkno
+  + wartosc : str
+  + notatki : set
+  + wygenerowane : bool
+  + odgadnieta : bool
+  --
+  + __init__(row, col, glowne_okno, parent=None)
+  + focusInEvent(event)
+  + keyPressEvent(event)
+  + ustaw_poczatkowa(val)
+  + odswiez_tekst()
 }
 
 class "GlowneOkno" as GlowneOkno {
-  stos_ekranow
-  ekran_menu
-  ekran_gry
-  lineedit_nazwa_swoja
-  radio_latwy
-  radio_sredni
-  radio_trudny
-  przycisk_start
-  checkbox_notatki
-  siatka_gry
-  komorki
-  akt_wiersz
-  akt_kolumna
-
-  __init__()
-  initUI()
-  initGraUI()
-  uruchom_gre()
-  aktualizuj_czas()
-  zaaktualizuj_widok_zyc()
-  odejmij_zycie()
-  sprawdz_stan_gry()
-  zakoncz_gre()
-  przejdz_do_rankingu()
-  ustaw_styl_komorki(komorka, r, c, kolor_tla)
-  odswiez_obecne_podswietlenie()
-  podswietl_obszary(klik_wiersz, klik_kolumna)
+  + stos_ekranow : QStackedWidget
+  + ekran_menu : QWidget
+  + ekran_gry : QWidget
+  + lineedit_nazwa_swoja : QLineEdit
+  + radio_latwy : QRadioButton
+  + radio_sredni : QRadioButton
+  + radio_trudny : QRadioButton
+  + przycisk_start : QPushButton
+  + przycisk_zakoncz : QPushButton
+  + checkbox_notatki : QCheckBox
+  + etykieta_zycia : QLabel
+  + etykieta_czasu : QLabel
+  + stoper : QTimer
+  + siatka_gry : QGridLayout
+  + komorki : list[][]
+  + plansza : Board
+  + rozwiazanie : str
+  + akt_wiersz : int
+  + akt_kolumna : int
+  + czas_startu : float
+  + zycia : int
+  + gra_zakonczona : bool
+  --
+  + __init__()
+  + initUI()
+  + initGraUI()
+  + uruchom_gre()
+  + aktualizuj_czas()
+  + zaktualizuj_widok_zyc()
+  + odejmij_zycie() : bool
+  + sprawdz_stan_gry()
+  + zakoncz_gre(wygrana=True)
+  + przejdz_do_rankingu(wygrana)
+  + ustaw_styl_komorki(komorka, r, c, kolor_tla, czy_blad=False)
+  + odswiez_obecne_podswietlenie()
+  + podswietl_obszary(klik_wiersz, klik_kolumna)
 }
 
 class "Board" as Board {
-  board
-  generateQuestionBoardCode(trudnosc)
+  + board : list[][]
+  + code : str
+  --
+  + __init__(code=None)
+  + isSolved() : bool
+  + getErrors() : set
+  + boardToCode(input_board=None) : str
+  + findSpaces() : tuple/bool
+  + checkSpace(num, space) : bool
+  + solve() : bool/list
+  + solveForCode() : str
+  + findNumberOfSolutions() : list
+  + generateQuestionBoard(fullBoard, difficulty) : tuple
+  + generateQuestionBoardCode(difficulty) : tuple
+  + printBoard()
+  - __resetBoard()
+  - __generateRandomCompleteBoard()
+  - __generateCont()
+  - __solveToFindNumberOfSolutions(row, col)
+  - __findSpacesToFindNumberOfSolutions(board, h)
 }
 
-
-
-- KLASY RANKINGU
-
+- KLASY RANKINGU 
 
 class "RankingManager" as RankingManager {
-  plik_bazy
-  wyniki
-
-  __init__(plik_bazy="ranking.json")
-  wczytaj_ranking()
-  zapisz_ranking()
-  dodaj_wynik(imie, poziom, czas_sekundy)
-  pobierz_posortowany_ranking(poziom)
+  + plik_bazy : str
+  + wyniki : dict
+  --
+  + __init__(plik_bazy="ranking.json")
+  + wczytaj_ranking() : dict
+  + zapisz_ranking()
+  + dodaj_wynik(imie, poziom, czas_sekundy)
+  + pobierz_posortowany_ranking(poziom) : list
 }
 
 class "RankingOkno" as RankingOkno {
-  manager
-  domyslny_poziom
-  tabele_widzety
-  zakladki
-
-  __init__(manager, domyslny_poziom="Średni", parent=None)
-  initUI()
-  formatuj_czas(sekundy)
-  odswiez_wszystkie_tabele()
+  + manager : RankingManager
+  + domyslny_poziom : str
+  + tabele_widzety : dict
+  + zakladki : QTabWidget
+  --
+  + __init__(manager, domyslny_poziom="Średni", parent=None)
+  + initUI()
+  + formatuj_czas(sekundy) : str
+  + odswiez_wszystkie_tabele()
 }
 
 class "FunkcjePomocnicze" as FunkcjePomocnicze <<utility>> {
-  rgb(r, g, b)
-  gra_zakonczona_sukcesem(okno_startowe, czas_startu)
+  + rgb(r, g, b) : str
 }
 
-
-
-- KLASY PyQt5
-
+- KLASY PyQt5 (Zewnętrzne) 
 
 class "QLineEdit" as QLineEdit
 class "QMainWindow" as QMainWindow
@@ -110,16 +131,13 @@ class "QCheckBox" as QCheckBox
 class "QTabWidget" as QTabWidget
 class "QTableWidget" as QTableWidget
 class "QTableWidgetItem" as QTableWidgetItem
+class "QTimer" as QTimer
 
-
-
-- DZIEDZICZENIE
+- DZIEDZICZENIE 
 
 SudokuCell --|> QLineEdit
 GlowneOkno --|> QMainWindow
 RankingOkno --|> QDialog
-
-
 
 - RELACJE GŁÓWNEJ GRY
 
@@ -128,10 +146,12 @@ GlowneOkno *-- QWidget : ekran_menu
 GlowneOkno *-- QWidget : ekran_gry
 GlowneOkno *-- QGridLayout : siatka_gry
 GlowneOkno *-- "81" SudokuCell : komorki
+GlowneOkno *-- Board : plansza
+GlowneOkno *-- QTimer : stoper
+GlowneOkno *-- QLabel : etykieta_zycia, etykieta_czasu
 
 SudokuCell --> GlowneOkno : glowne_okno
 
-GlowneOkno ..> Board : tworzy planszę
 GlowneOkno ..> QLabel : używa
 GlowneOkno ..> QGroupBox : używa
 GlowneOkno ..> QRadioButton : poziom trudności
@@ -140,8 +160,7 @@ GlowneOkno ..> QCheckBox : tryb notatek
 GlowneOkno ..> QVBoxLayout : używa
 GlowneOkno ..> QHBoxLayout : używa
 
-
-- RELACJE RANKINGU
+- RELACJE RANKINGU 
 
 RankingOkno --> RankingManager : manager
 RankingOkno *-- QTabWidget : zakladki
@@ -153,12 +172,9 @@ RankingOkno ..> QVBoxLayout : layout
 
 RankingManager ..> "ranking.json" : zapis / odczyt wyników
 
+- POWIĄZANIE GRY Z RANKINGIEM 
 
-
-- POWIĄZANIE GRY Z RANKINGIEM
-
-FunkcjePomocnicze ..> GlowneOkno : pobiera imię i poziom
-FunkcjePomocnicze ..> RankingManager : tworzy i dodaje wynik
-FunkcjePomocnicze ..> RankingOkno : pokazuje ranking
+GlowneOkno ..> RankingManager : tworzy i wywołuje w celu zapisu wyniku
+GlowneOkno ..> RankingOkno : tworzy i wyświetla modalnie po zakończeniu gry
 
 @enduml
