@@ -1,6 +1,5 @@
 import copy
 import random
-import pygame
 class Board:
     def isSolved(self):
         # brak pustych pól
