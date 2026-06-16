@@ -1,7 +1,7 @@
 import sys
 import timeit
 from generator import Board 
-from Ranking_czasów import RankingManager, RankingOkno
+from Ranking_czasow import RankingManager, RankingOkno
 
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtWidgets import (
