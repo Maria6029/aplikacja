@@ -41,8 +41,8 @@ class SudokuCell(QLineEdit):
         self.setAlignment(Qt.AlignCenter)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
-        self.setMinimumSize(180, 180)
-        self.setMaximumSize(200, 200) 
+        self.setMinimumSize(60, 60)
+        self.setMaximumSize(80, 80) 
 
         # Blokada standardowego wpisywania (obsługujemy to ręcznie)
         self.setReadOnly(True)
