@@ -2,6 +2,9 @@ import copy
 import random
 class Board:
     def isSolved(self):
+         """Sprawdza, czy plansza Sudoku jest rozwiązana.
+        Zwraca True, jeśli nie ma pustych pól ani błędów.
+        """
         # brak pustych pól
         for row in range(9):
             for col in range(9):
@@ -14,6 +17,9 @@ class Board:
 
         return True
     def getErrors(self):
+        """Sprawdza całą planszę i zwraca zbiór pól,
+        w których wpisane liczby są niezgodne z zasadami Sudoku.
+        """
         errors = set()
 
         for row in range(9):
@@ -34,6 +40,9 @@ class Board:
 
         return errors
     def __init__(self, code=None):
+        """Tworzy nowy obiekt planszy Sudoku.
+        Jeśli podano kod planszy, wczytuje go do tablicy 9x9.
+        """
         self.__resetBoard()
 
         if code:
@@ -47,6 +56,8 @@ class Board:
             self.code = None
 
     def __resetBoard(self):
+        """Resetuje planszę Sudoku, ustawiając wszystkie pola na 0.
+        Zero oznacza puste pole."""
         self.board = [
             [0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0],
@@ -59,14 +70,21 @@ class Board:
             [0,0,0,0,0,0,0,0,0],
         ]
         return self.board
-    def boardToCode(self, input_board=None): # turn a pre-existing board into a code
+    def boardToCode(self, input_board=None): 
+         """Zamienia planszę Sudoku na jeden ciąg znaków.
+        Jeśli podano planszę jako argument, zamienia ją na kod.
+        W przeciwnym razie zamienia aktualną planszę.
+        """
         if input_board:
             _code = ''.join([str(i) for j in input_board for i in j])
             return _code
         else:
             self.code = ''.join([str(i) for j in self.board for i in j])
             return self.code
-    def findSpaces(self): # finds the first empty space in the board, which is represented by a 0
+    def findSpaces(self): 
+        """Szuka pierwszego pustego pola na planszy.
+        Puste pole jest oznaczone liczbą 0.
+        """
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
                 if self.board[row][col] == 0:
@@ -75,7 +93,10 @@ class Board:
         return False
 
 
-    def checkSpace(self, num, space):  # checks to see if a number can be fitted into a specifc space; row, col
+    def checkSpace(self, num, space): 
+        """Sprawdza, czy daną liczbę można wpisać w wybrane pole.
+        Kontroluje wiersz, kolumnę oraz kwadrat 3x3.
+        """
         if not self.board[space[0]][space[1]] == 0:  # check to see if space is a number already
             return False
 
@@ -98,7 +119,11 @@ class Board:
         return True
 
 
-    def solve(self):  # solves a board using recursion
+    def solve(self): 
+         """
+        Rozwiązuje planszę Sudoku metodą rekurencji i cofania.
+        Zwraca rozwiązaną planszę albo False, jeśli nie da się jej rozwiązać.
+        """
         _spacesAvailable = self.findSpaces()
 
         if not _spacesAvailable:
@@ -116,10 +141,15 @@ class Board:
                 self.board[row][col] = 0
 
         return False
-    def solveForCode(self): # solves a board and returns the code of the solved board
+    def solveForCode(self): 
+        """Rozwiązuje planszę Sudoku i zwraca rozwiązanie jako ciąg znaków.
+        """
         return self.boardToCode(self.solve())
 
-    def __generateRandomCompleteBoard(self):  # generates a brand new completely random board full of numbers
+    def __generateRandomCompleteBoard(self):  
+        """Generuje nową, kompletną i poprawnie uzupełnioną planszę Sudoku.
+        Najpierw losowo wypełnia trzy kwadraty 3x3, a potem uzupełnia resztę.
+        """
         self.__resetBoard()
 
         _l = list(range(1, 10))
@@ -144,7 +174,10 @@ class Board:
                 _l.remove(_num)
 
         return self.__generateCont()
-    def __generateCont(self): # uses recursion to finish generating a random board
+    def __generateCont(self): 
+         """Kontynuuje generowanie pełnej planszy Sudoku.
+        Uzupełnia puste pola losowymi liczbami zgodnymi z zasadami gry.
+        """
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 if self.board[row][col] == 0:
@@ -161,8 +194,10 @@ class Board:
 
         return False
 
-    def __solveToFindNumberOfSolutions(self, row,
-                                        col):  # solves the board using recursion, is used within the findNumberOfSolutions method
+    def __solveToFindNumberOfSolutions(self, row, col):  
+     """Pomocniczo rozwiązuje planszę od wskazanego pola.
+        Funkcja jest używana podczas sprawdzania liczby możliwych rozwiązań.
+        """
         for n in range(1, 10):
             if self.checkSpace(n, (row, col)):
                 self.board[row][col] = n
@@ -174,6 +209,9 @@ class Board:
 
         return False
     def __findSpacesToFindNumberOfSolutions(self, board, h): # finds the first empty space it comes across, is used within the findNumberOfSolutions method
+         """Znajduje h-te puste pole na planszy.
+        Funkcja pomocnicza używana przy sprawdzaniu liczby rozwiązań.
+        """
         _k = 1
         for row in range(len(board)):
             for col in range(len(board[row])):
@@ -187,6 +225,10 @@ class Board:
 
 
     def findNumberOfSolutions(self):  # finds the number of solutions to a board and returns the list of solutions
+        """Szuka możliwych rozwiązań aktualnej planszy.
+        Zwraca listę unikalnych rozwiązań zapisanych jako kody tekstowe.
+        """
+        
         _z = 0
         _list_of_solutions = []
 
@@ -206,7 +248,10 @@ class Board:
         return list(set(_list_of_solutions))
 
     def generateQuestionBoard(self, fullBoard,
-                                difficulty):  # generates a question board with a certain number of cells removed depending on the chosen difficulty
+                                difficulty): 
+       """Tworzy planszę do gry na podstawie pełnej rozwiązanej planszy.
+        Usuwa określoną liczbę pól w zależności od poziomu trudności.
+        """ 
         self.board = copy.deepcopy(fullBoard)
 
         if difficulty == 0:
@@ -259,10 +304,16 @@ class Board:
                 _counter += 1
 
         return self.board, fullBoard
-    def generateQuestionBoardCode(self, difficulty): # generates a new random board and its board code depending on the difficulty
+    def generateQuestionBoardCode(self, difficulty): 
+        """Generuje nową planszę Sudoku do gry oraz jej rozwiązanie.
+        Zwraca oba elementy jako kody tekstowe.
+        """
         self.board, _solution_board = self.generateQuestionBoard(self.__generateRandomCompleteBoard(), difficulty)
         return self.boardToCode(), self.boardToCode(_solution_board)
     def printBoard(self):
+        """Wypisuje aktualną planszę Sudoku w konsoli.
+        Każdy wiersz planszy jest drukowany osobno.
+        """
         for i in range(9):
             row = ""
             for j in range(9):
