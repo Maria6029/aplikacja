@@ -1,64 +1,67 @@
 import copy
 import random
-class Board:
-    def isSolved(self):
-         """Sprawdza, czy plansza Sudoku jest rozwiązana.
+
+class Plansza:
+    def czy_rozwiazana(self):
+        """Sprawdza, czy plansza Sudoku jest rozwiązana.
         Zwraca True, jeśli nie ma pustych pól ani błędów.
         """
         # brak pustych pól
-        for row in range(9):
-            for col in range(9):
-                if self.board[row][col] == 0:
+        for wiersz in range(9):
+            for kolumna in range(9):
+                if self.plansza[wiersz][kolumna] == 0:
                     return False
 
         # brak błędów
-        if len(self.getErrors()) > 0:
+        if len(self.pobierz_bledy()) > 0:
             return False
 
         return True
-    def getErrors(self):
+
+    def pobierz_bledy(self):
         """Sprawdza całą planszę i zwraca zbiór pól,
         w których wpisane liczby są niezgodne z zasadami Sudoku.
         """
-        errors = set()
+        bledy = set()
 
-        for row in range(9):
-            for col in range(9):
-                num = self.board[row][col]
+        for wiersz in range(9):
+            for kolumna in range(9):
+                liczba = self.plansza[wiersz][kolumna]
 
-                if num == 0:
+                if liczba == 0:
                     continue
 
                 # tymczasowo usuwamy liczbę
-                self.board[row][col] = 0
+                self.plansza[wiersz][kolumna] = 0
 
-                if not self.checkSpace(num, (row, col)):
-                    errors.add((row, col))
+                if not self.sprawdz_pole(liczba, (wiersz, kolumna)):
+                    bledy.add((wiersz, kolumna))
 
                 # przywracamy
-                self.board[row][col] = num
+                self.plansza[wiersz][kolumna] = liczba
 
-        return errors
-    def __init__(self, code=None):
+        return bledy
+
+    def __init__(self, kod=None):
         """Tworzy nowy obiekt planszy Sudoku.
         Jeśli podano kod planszy, wczytuje go do tablicy 9x9.
         """
-        self.__resetBoard()
+        self.__resetuj_plansze()
 
-        if code:
-            self.code = code
+        if kod:
+            self.kod = kod
 
-            for row in range(9):
-                for col in range(9):
-                    self.board[row][col] = int(code[0])
-                    code = code[1:]
+            for wiersz in range(9):
+                for kolumna in range(9):
+                    self.plansza[wiersz][kolumna] = int(kod[0])
+                    kod = kod[1:]
         else:
-            self.code = None
+            self.kod = None
 
-    def __resetBoard(self):
+    def __resetuj_plansze(self):
         """Resetuje planszę Sudoku, ustawiając wszystkie pola na 0.
         Zero oznacza puste pole."""
-        self.board = [
+        self.plansza = [
             [0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0],
@@ -69,274 +72,251 @@ class Board:
             [0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0],
         ]
-        return self.board
-    def boardToCode(self, input_board=None): 
-         """Zamienia planszę Sudoku na jeden ciąg znaków.
+        return self.plansza
+
+    def plansza_na_kod(self, wejsciowa_plansza=None): 
+        """Zamienia planszę Sudoku na jeden ciąg znaków.
         Jeśli podano planszę jako argument, zamienia ją na kod.
         W przeciwnym razie zamienia aktualną planszę.
         """
-        if input_board:
-            _code = ''.join([str(i) for j in input_board for i in j])
-            return _code
+        if wejsciowa_plansza:
+            _kod = ''.join([str(i) for j in wejsciowa_plansza for i in j])
+            return _kod
         else:
-            self.code = ''.join([str(i) for j in self.board for i in j])
-            return self.code
-    def findSpaces(self): 
+            self.kod = ''.join([str(i) for j in self.plansza for i in j])
+            return self.kod
+
+    def znajdz_puste_pole(self): 
         """Szuka pierwszego pustego pola na planszy.
         Puste pole jest oznaczone liczbą 0.
         """
-        for row in range(len(self.board)):
-            for col in range(len(self.board[0])):
-                if self.board[row][col] == 0:
-                    return (row, col)
+        for wiersz in range(len(self.plansza)):
+            for kolumna in range(len(self.plansza[0])):
+                if self.plansza[wiersz][kolumna] == 0:
+                    return (wiersz, kolumna)
 
         return False
 
-
-    def checkSpace(self, num, space): 
+    def sprawdz_pole(self, liczba, pozycja): 
         """Sprawdza, czy daną liczbę można wpisać w wybrane pole.
         Kontroluje wiersz, kolumnę oraz kwadrat 3x3.
         """
-        if not self.board[space[0]][space[1]] == 0:  # check to see if space is a number already
+        if not self.plansza[pozycja[0]][pozycja[1]] == 0:  
             return False
 
-        for col in self.board[space[0]]:  # check to see if number is already in row
-            if col == num:
+        for kolumna in self.plansza[pozycja[0]]:  
+            if kolumna == liczba:
                 return False
 
-        for row in range(len(self.board)):  # check to see if number is already in column
-            if self.board[row][space[1]] == num:
+        for wiersz in range(len(self.plansza)):  
+            if self.plansza[wiersz][pozycja[1]] == liczba:
                 return False
 
-        _internalBoxRow = space[0] // 3
-        _internalBoxCol = space[1] // 3
+        wewnetrzny_kwadrat_wiersz = pozycja[0] // 3
+        wewnetrzny_kwadrat_kolumna = pozycja[1] // 3
 
-        for i in range(3):  # check to see if internal box already has number
+        for i in range(3):  
             for j in range(3):
-                if self.board[i + (_internalBoxRow * 3)][j + (_internalBoxCol * 3)] == num:
+                if self.plansza[i + (wewnetrzny_kwadrat_wiersz * 3)][j + (wewnetrzny_kwadrat_kolumna * 3)] == liczba:
                     return False
 
         return True
 
-
-    def solve(self): 
-         """
+    def rozwiaz(self): 
+        """
         Rozwiązuje planszę Sudoku metodą rekurencji i cofania.
         Zwraca rozwiązaną planszę albo False, jeśli nie da się jej rozwiązać.
         """
-        _spacesAvailable = self.findSpaces()
+        dostepne_pola = self.znajdz_puste_pole()
 
-        if not _spacesAvailable:
+        if not dostepne_pola:
             return True
         else:
-            row, col = _spacesAvailable
+            wiersz, kolumna = dostepne_pola
 
         for n in range(1, 10):
-            if self.checkSpace(n, (row, col)):
-                self.board[row][col] = n
+            if self.sprawdz_pole(n, (wiersz, kolumna)):
+                self.plansza[wiersz][kolumna] = n
 
-                if self.solve():
-                    return self.board
+                if self.rozwiaz():
+                    return self.plansza
 
-                self.board[row][col] = 0
+                self.plansza[wiersz][kolumna] = 0
 
         return False
-    def solveForCode(self): 
+
+    def rozwiaz_na_kod(self): 
         """Rozwiązuje planszę Sudoku i zwraca rozwiązanie jako ciąg znaków.
         """
-        return self.boardToCode(self.solve())
+        return self.plansza_na_kod(self.rozwiaz())
 
-    def __generateRandomCompleteBoard(self):  
+    def __generuj_losowa_pelna_plansze(self):  
         """Generuje nową, kompletną i poprawnie uzupełnioną planszę Sudoku.
         Najpierw losowo wypełnia trzy kwadraty 3x3, a potem uzupełnia resztę.
         """
-        self.__resetBoard()
+        self.__resetuj_plansze()
 
         _l = list(range(1, 10))
-        for row in range(3):
-            for col in range(3):
-                _num = random.choice(_l)
-                self.board[row][col] = _num
-                _l.remove(_num)
+        for wiersz in range(3):
+            for kolumna in range(3):
+                _liczba = random.choice(_l)
+                self.plansza[wiersz][kolumna] = _liczba
+                _l.remove(_liczba)
 
         _l = list(range(1, 10))
-        for row in range(3, 6):
-            for col in range(3, 6):
-                _num = random.choice(_l)
-                self.board[row][col] = _num
-                _l.remove(_num)
+        for wiersz in range(3, 6):
+            for kolumna in range(3, 6):
+                _liczba = random.choice(_l)
+                self.plansza[wiersz][kolumna] = _liczba
+                _l.remove(_liczba)
 
         _l = list(range(1, 10))
-        for row in range(6, 9):
-            for col in range(6, 9):
-                _num = random.choice(_l)
-                self.board[row][col] = _num
-                _l.remove(_num)
+        for wiersz in range(6, 9):
+            for kolumna in range(6, 9):
+                _liczba = random.choice(_l)
+                self.plansza[wiersz][kolumna] = _liczba
+                _l.remove(_liczba)
 
-        return self.__generateCont()
-    def __generateCont(self): 
-         """Kontynuuje generowanie pełnej planszy Sudoku.
+        return self.__generuj_kontynuacje()
+
+    def __generuj_kontynuacje(self): 
+        """Kontynuuje generowanie pełnej planszy Sudoku.
         Uzupełnia puste pola losowymi liczbami zgodnymi z zasadami gry.
         """
-        for row in range(len(self.board)):
-            for col in range(len(self.board[row])):
-                if self.board[row][col] == 0:
-                    _num = random.randint(1, 9)
+        for wiersz in range(len(self.plansza)):
+            for kolumna in range(len(self.plansza[wiersz])):
+                if self.plansza[wiersz][kolumna] == 0:
+                    _liczba = random.randint(1, 9)
 
-                    if self.checkSpace(_num, (row, col)):
-                        self.board[row][col] = _num
+                    if self.sprawdz_pole(_liczba, (wiersz, kolumna)):
+                        self.plansza[wiersz][kolumna] = _liczba
 
-                        if self.solve():
-                            self.__generateCont()
-                            return self.board
+                        if self.rozwiaz():
+                            self.__generuj_kontynuacje()
+                            return self.plansza
 
-                        self.board[row][col] = 0
+                        self.plansza[wiersz][kolumna] = 0
 
         return False
 
-    def __solveToFindNumberOfSolutions(self, row, col):  
-     """Pomocniczo rozwiązuje planszę od wskazanego pola.
-        Funkcja jest używana podczas sprawdzania liczby możliwych rozwiązań.
-        """
+
+    def __szukaj_rozwiazan_rekurencja(self, rozwiazania):
+        """Pomocnicza funkcja rekurencyjna do zliczania rozwiązań."""
+        # Przerywamy natychmiast, gdy znajdziemy drugie rozwiązanie
+        if len(rozwiazania) > 1:
+            return 
+
+        pole = self.znajdz_puste_pole()
+        if not pole:
+            rozwiazania.append("znalazlem") # Dodajemy cokolwiek do listy, by zliczyć rozwiązanie
+            return
+
+        wiersz, kolumna = pole
         for n in range(1, 10):
-            if self.checkSpace(n, (row, col)):
-                self.board[row][col] = n
+            if self.sprawdz_pole(n, (wiersz, kolumna)):
+                self.plansza[wiersz][kolumna] = n
+                self.__szukaj_rozwiazan_rekurencja(rozwiazania)
+                self.plansza[wiersz][kolumna] = 0 # Cofamy krok po powrocie
 
-                if self.solve():
-                    return self.board
-
-                self.board[row][col] = 0
-
-        return False
-    def __findSpacesToFindNumberOfSolutions(self, board, h): # finds the first empty space it comes across, is used within the findNumberOfSolutions method
-         """Znajduje h-te puste pole na planszy.
-        Funkcja pomocnicza używana przy sprawdzaniu liczby rozwiązań.
-        """
-        _k = 1
-        for row in range(len(board)):
-            for col in range(len(board[row])):
-                if board[row][col] == 0:
-                    if _k == h:
-                        return (row, col)
-
-                    _k += 1
-
-        return False
-
-
-    def findNumberOfSolutions(self):  # finds the number of solutions to a board and returns the list of solutions
+    def znajdz_liczbe_rozwiazan(self): 
         """Szuka możliwych rozwiązań aktualnej planszy.
-        Zwraca listę unikalnych rozwiązań zapisanych jako kody tekstowe.
         """
-        
-        _z = 0
-        _list_of_solutions = []
+        rozwiazania = []
+        self.__szukaj_rozwiazan_rekurencja(rozwiazania)
+        return rozwiazania
 
-        for row in range(len(self.board)):
-            for col in range(len(self.board[row])):
-                if self.board[row][col] == 0:
-                    _z += 1
 
-        for i in range(1, _z + 1):
-            _board_copy = copy.deepcopy(self)
-
-            _row, _col = self.__findSpacesToFindNumberOfSolutions(_board_copy.board, i)
-            _board_copy_solution = _board_copy.__solveToFindNumberOfSolutions(_row, _col)
-
-            _list_of_solutions.append(self.boardToCode(input_board=_board_copy_solution))
-
-        return list(set(_list_of_solutions))
-
-    def generateQuestionBoard(self, fullBoard,
-                                difficulty): 
-       """Tworzy planszę do gry na podstawie pełnej rozwiązanej planszy.
+    def generuj_plansze_gry(self, pelna_plansza, trudnosc): 
+        """Tworzy planszę do gry na podstawie pełnej rozwiązanej planszy.
         Usuwa określoną liczbę pól w zależności od poziomu trudności.
         """ 
-        self.board = copy.deepcopy(fullBoard)
+        self.plansza = copy.deepcopy(pelna_plansza)
 
-        if difficulty == 0:
-            _squares_to_remove = 36
-        elif difficulty == 1:
-            _squares_to_remove = 46
-        elif difficulty == 2:
-            _squares_to_remove = 52
+        if trudnosc == 0:
+            _pola_do_usuniecia = 36
+        elif trudnosc == 1:
+            _pola_do_usuniecia = 46
+        elif trudnosc == 2:
+            _pola_do_usuniecia = 52
         else:
             return
 
-        _counter = 0
-        while _counter < 4:
-            _rRow = random.randint(0, 2)
-            _rCol = random.randint(0, 2)
-            if self.board[_rRow][_rCol] != 0:
-                self.board[_rRow][_rCol] = 0
-                _counter += 1
+        _licznik = 0
+        while _licznik < 4:
+            _losowy_wiersz = random.randint(0, 2)
+            _losowa_kolumna = random.randint(0, 2)
+            if self.plansza[_losowy_wiersz][_losowa_kolumna] != 0:
+                self.plansza[_losowy_wiersz][_losowa_kolumna] = 0
+                _licznik += 1
 
-        _counter = 0
-        while _counter < 4:
-            _rRow = random.randint(3, 5)
-            _rCol = random.randint(3, 5)
-            if self.board[_rRow][_rCol] != 0:
-                self.board[_rRow][_rCol] = 0
-                _counter += 1
+        _licznik = 0
+        while _licznik < 4:
+            _losowy_wiersz = random.randint(3, 5)
+            _losowa_kolumna = random.randint(3, 5)
+            if self.plansza[_losowy_wiersz][_losowa_kolumna] != 0:
+                self.plansza[_losowy_wiersz][_losowa_kolumna] = 0
+                _licznik += 1
 
-        _counter = 0
-        while _counter < 4:
-            _rRow = random.randint(6, 8)
-            _rCol = random.randint(6, 8)
-            if self.board[_rRow][_rCol] != 0:
-                self.board[_rRow][_rCol] = 0
-                _counter += 1
+        _licznik = 0
+        while _licznik < 4:
+            _losowy_wiersz = random.randint(6, 8)
+            _losowa_kolumna = random.randint(6, 8)
+            if self.plansza[_losowy_wiersz][_losowa_kolumna] != 0:
+                self.plansza[_losowy_wiersz][_losowa_kolumna] = 0
+                _licznik += 1
 
-        _squares_to_remove -= 12
-        _counter = 0
-        while _counter < _squares_to_remove:
-            _row = random.randint(0, 8)
-            _col = random.randint(0, 8)
+        _pola_do_usuniecia -= 12
+        _licznik = 0
+        while _licznik < _pola_do_usuniecia:
+            _wiersz = random.randint(0, 8)
+            _kolumna = random.randint(0, 8)
 
-            if self.board[_row][_col] != 0:
-                n = self.board[_row][_col]
-                self.board[_row][_col] = 0
+            if self.plansza[_wiersz][_kolumna] != 0:
+                n = self.plansza[_wiersz][_kolumna]
+                self.plansza[_wiersz][_kolumna] = 0
 
-                if len(self.findNumberOfSolutions()) != 1:
-                    self.board[_row][_col] = n
+                if len(self.znajdz_liczbe_rozwiazan()) != 1:
+                    self.plansza[_wiersz][_kolumna] = n
                     continue
 
-                _counter += 1
+                _licznik += 1
 
-        return self.board, fullBoard
-    def generateQuestionBoardCode(self, difficulty): 
+        return self.plansza, pelna_plansza
+
+    def generuj_kod_planszy_gry(self, trudnosc): 
         """Generuje nową planszę Sudoku do gry oraz jej rozwiązanie.
         Zwraca oba elementy jako kody tekstowe.
         """
-        self.board, _solution_board = self.generateQuestionBoard(self.__generateRandomCompleteBoard(), difficulty)
-        return self.boardToCode(), self.boardToCode(_solution_board)
-    def printBoard(self):
+        self.plansza, _rozwiazana_plansza = self.generuj_plansze_gry(self.__generuj_losowa_pelna_plansze(), trudnosc)
+        return self.plansza_na_kod(), self.plansza_na_kod(_rozwiazana_plansza)
+
+    def wypisz_plansze(self):
         """Wypisuje aktualną planszę Sudoku w konsoli.
         Każdy wiersz planszy jest drukowany osobno.
         """
         for i in range(9):
-            row = ""
+            wiersz = ""
             for j in range(9):
-                val = self.board[i][j]
-                row += str(val) + " "
-            print(row)
+                wartosc = self.plansza[i][j]
+                wiersz += str(wartosc) + " "
+            print(wiersz)
+
 if __name__ == "__main__":
-    board = Board()
+    plansza_obiekt = Plansza()
 
-    question_board_code = board.generateQuestionBoardCode(0)
+    kody_planszy_gry = plansza_obiekt.generuj_kod_planszy_gry(0)
 
+    print("KOD (ciąg znaków):")
+    print(kody_planszy_gry[0])
 
-    print("CODE (string):")
-    print(question_board_code[0])
+    print("\nPLANSZA (2D):")
+    plansza_obiekt.wypisz_plansze()
+    zablokowane_komorki = set()
 
-    print("\nBOARD (2D):")
-    board.printBoard()
-    fixed_cells = set()
-
-    for row in range(9):
-        for col in range(9):
-            if board.board[row][col] != 0:
-                fixed_cells.add((row, col))
+    for wiersz in range(9):
+        for kolumna in range(9):
+            if plansza_obiekt.plansza[wiersz][kolumna] != 0:
+                zablokowane_komorki.add((wiersz, kolumna))
 
 
 
