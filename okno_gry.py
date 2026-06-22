@@ -49,9 +49,6 @@ LANGUAGES = {
         "time": "Czas",
         "anonymous": "Anonim",
         "language_label": "Wybierz język:",
-        "polish": "Polski",
-        "ukrainian": "Українська",
-        "english": "Angielski"
     },
     "ua": {
         "window_title": "Судоку",
@@ -84,9 +81,6 @@ LANGUAGES = {
         "time": "Час",
         "anonymous": "Анонім",
         "language_label": "Оберіть мову:",
-        "polish": "Польська",
-        "ukrainian": "Українська",
-        "english": "Англійська"
        
     },
     "en": {
@@ -120,9 +114,6 @@ LANGUAGES = {
         "time": "Time",
         "anonymous": "Anonymous",
         "language_label": "Choose language:",
-        "polish": "Polish",
-        "ukrainian": "Ukrainian",
-        "english": "English"
         
     }
 }
@@ -290,9 +281,6 @@ class GlowneOkno(QMainWindow):
         self.radio_trudny.setText(self.translate("hard"))
         self.przycisk_start.setText(self.translate("start_game"))
         self.etykieta_jezyk.setText(self.translate("language_label"))
-        self.przycisk_pl.setText(self.translate("polish"))
-        self.przycisk_ua.setText(self.translate("ukrainian"))
-        self.przycisk_en.setText(self.translate("english"))
         self.przycisk_wroc.setText(self.translate("back_to_menu"))
         self.checkbox_notatki.setText(self.translate("notes_mode"))
         self.przycisk_zakoncz.setText(self.translate("surrender_button"))
@@ -369,9 +357,9 @@ class GlowneOkno(QMainWindow):
         kolumna1.addWidget(self.etykieta_jezyk)
 
         self.pasek_jezyka = QHBoxLayout()
-        self.przycisk_pl = QPushButton(self.translate("polish"))
-        self.przycisk_ua = QPushButton(self.translate("ukrainian"))
-        self.przycisk_en = QPushButton(self.translate("english"))
+        self.przycisk_pl = QPushButton("Polski")
+        self.przycisk_ua = QPushButton("Українська")
+        self.przycisk_en = QPushButton("English")
         style_language_button = f"QPushButton {{ background-color: {rgb(248, 249, 250)}; color: {rgb(30, 41, 59)}; font-size: 16px; font-weight: bold; padding: 12px 18px; border-radius: 10px; border: 1px solid {rgb(203, 213, 225)}; }} QPushButton:hover {{ background-color: {rgb(226, 232, 240)}; }}"
         self.przycisk_pl.setStyleSheet(style_language_button)
         self.przycisk_ua.setStyleSheet(style_language_button)
