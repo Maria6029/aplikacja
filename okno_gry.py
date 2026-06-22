@@ -258,7 +258,7 @@ class GlowneOkno(QMainWindow):
         self.zycia = 3
        
         self.gra_zakonczona = False
-        elf.liczba_podpowiedzi = 3
+        self.liczba_podpowiedzi = 3
         self.initUI()     
         self.initGraUI()  
 
