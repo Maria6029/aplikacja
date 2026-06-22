@@ -569,86 +569,86 @@ class GlowneOkno(QMainWindow):
                 color: #e2e8f0;
             }}
         """)
-    self.przycisk_podpowiedz.clicked.connect(self.uzyj_podpowiedzi)
-    lewy_panel.addWidget(self.przycisk_podpowiedz)
+        self.przycisk_podpowiedz.clicked.connect(self.uzyj_podpowiedzi)
+        lewy_panel.addWidget(self.przycisk_podpowiedz)
 
-    self.przycisk_instrukcja = QPushButton(self.translate("instruction_btn"))
-    self.przycisk_instrukcja.setStyleSheet(f"""
-        QPushButton {{ 
-            background-color: {rgb(30, 41, 59)}; 
-            color: white; 
-            font-size: 14px; 
-            font-weight: bold; 
-            padding: 8px; 
-            border-radius: 8px; 
-            margin-top: 10px; 
-        }}
-        QPushButton:hover {{ background-color: {rgb(51, 65, 85)}; }}
-    """)
-    lewy_panel.addWidget(self.przycisk_instrukcja)
+        self.przycisk_instrukcja = QPushButton(self.translate("instruction_btn"))
+        self.przycisk_instrukcja.setStyleSheet(f"""
+            QPushButton {{ 
+                background-color: {rgb(30, 41, 59)}; 
+                color: white; 
+                font-size: 14px; 
+                font-weight: bold; 
+                padding: 8px; 
+                border-radius: 8px; 
+                margin-top: 10px; 
+            }}
+            QPushButton:hover {{ background-color: {rgb(51, 65, 85)}; }}
+        """)
+        lewy_panel.addWidget(self.przycisk_instrukcja)
 
-    self.etykieta_opis_notatek = QLabel(self.translate("instruction_desc"))
-    self.etykieta_opis_notatek.setWordWrap(True)
-    self.etykieta_opis_notatek.setFixedWidth(200)
-    self.etykieta_opis_notatek.setStyleSheet(f"""
-        font-family: 'Segoe UI'; font-size: 13px; color: {rgb(51, 65, 85)};
-        margin-top: 5px; margin-bottom: 5px; background-color: transparent;
-    """)
-    self.etykieta_opis_notatek.setVisible(False)
-    lewy_panel.addWidget(self.etykieta_opis_notatek)
-    def przelacz_instrukcje():
-        stan_obecny = self.etykieta_opis_notatek.isVisible()
-        self.etykieta_opis_notatek.setVisible(not stan_obecny)
+        self.etykieta_opis_notatek = QLabel(self.translate("instruction_desc"))
+        self.etykieta_opis_notatek.setWordWrap(True)
+        self.etykieta_opis_notatek.setFixedWidth(200)
+        self.etykieta_opis_notatek.setStyleSheet(f"""
+            font-family: 'Segoe UI'; font-size: 13px; color: {rgb(51, 65, 85)};
+            margin-top: 5px; margin-bottom: 5px; background-color: transparent;
+        """)
+        self.etykieta_opis_notatek.setVisible(False)
+        lewy_panel.addWidget(self.etykieta_opis_notatek)
+        def przelacz_instrukcje():
+            stan_obecny = self.etykieta_opis_notatek.isVisible()
+            self.etykieta_opis_notatek.setVisible(not stan_obecny)
 
-    self.przycisk_instrukcja.clicked.connect(przelacz_instrukcje)
+        self.przycisk_instrukcja.clicked.connect(przelacz_instrukcje)
 
 
         
-    self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
-    self.przycisk_zakoncz.setStyleSheet(f"""
-        QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
-        QPushButton:hover {{ background-color: rgb(185, 28, 28); }}
-    """)
-    self.przycisk_zakoncz.clicked.connect(lambda: self.zakoncz_gre(wygrana=False))
+        self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
+        self.przycisk_zakoncz.setStyleSheet(f"""
+            QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
+            QPushButton:hover {{ background-color: rgb(185, 28, 28); }}
+        """)
+        self.przycisk_zakoncz.clicked.connect(lambda: self.zakoncz_gre(wygrana=False))
 
-    self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
-    self.przycisk_zakoncz.setStyleSheet(f"""
-        QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
-        QPushButton:hover {{ background-color: rgb(185, 28, 28); }}
-    """)
-    self.przycisk_zakoncz.clicked.connect(lambda: self.zakoncz_gre(wygrana=False))
-    lewy_panel.addWidget(self.przycisk_zakoncz)
+        self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
+        self.przycisk_zakoncz.setStyleSheet(f"""
+            QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
+            QPushButton:hover {{ background-color: rgb(185, 28, 28); }}
+        """)
+        self.przycisk_zakoncz.clicked.connect(lambda: self.zakoncz_gre(wygrana=False))
+        lewy_panel.addWidget(self.przycisk_zakoncz)
 
-    lewy_panel.addStretch()
-    layout_glowny_gry.addLayout(lewy_panel)
+        lewy_panel.addStretch()
+        layout_glowny_gry.addLayout(lewy_panel)
 
         # PLANSZA
-    self.siatka_gry = QGridLayout()
-    self.siatka_gry.setSpacing(0)
-    self.komorki = [[None for _ in range(9)] for _ in range(9)]
+        self.siatka_gry = QGridLayout()
+        self.siatka_gry.setSpacing(0)
+        self.komorki = [[None for _ in range(9)] for _ in range(9)]
 
-    for wiersz in range(9):
-        for kolumna in range(9):
-            komorka = SudokuCell(wiersz, kolumna, self)
-            komorka.fokus_otrzymany.connect(self.podswietl_obszary)
-            self.komorki[wiersz][kolumna] = komorka
-            self.siatka_gry.addWidget(komorka, wiersz, kolumna)
-            self.ustaw_styl_komorki(komorka, wiersz, kolumna, "white")
+        for wiersz in range(9):
+            for kolumna in range(9):
+                komorka = SudokuCell(wiersz, kolumna, self)
+                komorka.fokus_otrzymany.connect(self.podswietl_obszary)
+                self.komorki[wiersz][kolumna] = komorka
+                self.siatka_gry.addWidget(komorka, wiersz, kolumna)
+                self.ustaw_styl_komorki(komorka, wiersz, kolumna, "white")
 
-    srodek_pion = QVBoxLayout()
-    srodek_pion.addStretch(1)
+        srodek_pion = QVBoxLayout()
+        srodek_pion.addStretch(1)
         
-    srodek_poziom = QHBoxLayout()
-    srodek_poziom.addStretch(1)
-    srodek_poziom.addLayout(self.siatka_gry)
-    srodek_poziom.addStretch(1)
+        srodek_poziom = QHBoxLayout()
+        srodek_poziom.addStretch(1)
+        srodek_poziom.addLayout(self.siatka_gry)
+        srodek_poziom.addStretch(1)
         
-    srodek_pion.addLayout(srodek_poziom)
-    srodek_pion.addStretch(1)
+        srodek_pion.addLayout(srodek_poziom)
+        srodek_pion.addStretch(1)
 
-    layout_glowny_gry.addLayout(srodek_pion, stretch=1)
-    self.ekran_gry.setLayout(layout_glowny_gry)
-    self.stos_ekranow.addWidget(self.ekran_gry)
+        layout_glowny_gry.addLayout(srodek_pion, stretch=1)
+        self.ekran_gry.setLayout(layout_glowny_gry)
+        self.stos_ekranow.addWidget(self.ekran_gry)
 
     def uruchom_gre(self):
         self.czas_startu = timeit.default_timer()
