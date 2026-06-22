@@ -462,6 +462,28 @@ class GlowneOkno(QMainWindow):
             QCheckBox::indicator {{ width: 25px; height: 25px; }}
         """)
         lewy_panel.addWidget(self.checkbox_notatki)
+        
+        self.przycisk_podpowiedz = QPushButton(self.translate("hint_button").format(3))
+        self.przycisk_podpowiedz.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {rgb(30, 41, 59)};
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                padding: 12px;
+                border-radius: 10px;
+                margin-top: 15px;
+            }}
+            QPushButton:hover {{
+                background-color: {rgb(51, 65, 85)};
+            }}
+            QPushButton:disabled {{
+                background-color: #94a3b8;
+                color: #e2e8f0;
+            }}
+        """)
+self.przycisk_podpowiedz.clicked.connect(self.uzyj_podpowiedzi)
+lewy_panel.addWidget(self.przycisk_podpowiedz)
 
         self.przycisk_instrukcja = QPushButton(self.translate("instruction_btn"))
         self.przycisk_instrukcja.setStyleSheet(f"""
