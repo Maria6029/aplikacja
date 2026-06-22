@@ -569,8 +569,8 @@ class GlowneOkno(QMainWindow):
                 color: #e2e8f0;
             }}
         """)
-self.przycisk_podpowiedz.clicked.connect(self.uzyj_podpowiedzi)
-lewy_panel.addWidget(self.przycisk_podpowiedz)
+    self.przycisk_podpowiedz.clicked.connect(self.uzyj_podpowiedzi)
+    lewy_panel.addWidget(self.przycisk_podpowiedz)
 
     self.przycisk_instrukcja = QPushButton(self.translate("instruction_btn"))
     self.przycisk_instrukcja.setStyleSheet(f"""
