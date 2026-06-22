@@ -297,224 +297,224 @@ class GlowneOkno(QMainWindow):
             self.zaktualizuj_widok_zyc()
             
         def wycentruj_okno(self):
-        ekran = QApplication.primaryScreen()
-        geometria_ekranu = ekran.availableGeometry()
-
-        geometria_okna = self.frameGeometry()
-        geometria_okna.moveCenter(geometria_ekranu.center())
-
-        self.move(geometria_okna.topLeft())
+            ekran = QApplication.primaryScreen()
+            geometria_ekranu = ekran.availableGeometry()
+    
+            geometria_okna = self.frameGeometry()
+            geometria_okna.moveCenter(geometria_ekranu.center())
+    
+            self.move(geometria_okna.topLeft())
         
         def initUI(self):
-        self.ekran_menu = QWidget()
-
-        layout_strony = QVBoxLayout()
-        layout_strony.setContentsMargins(50, 25, 50, 30)
-        layout_strony.setSpacing(20)
-        layout_strony.addSpacing(10)
-
-        self.napis_sudoku = QLabel(self.translate("sudoku_title"))
-        self.napis_sudoku.setAlignment(Qt.AlignCenter)
-        self.napis_sudoku.setStyleSheet(f"""
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 64px;
-            font-weight: 900;
-            color: {rgb(30, 41, 59)};
-            letter-spacing: 10px;
-            margin-bottom: 0px;
-        """)
-        layout_strony.addWidget(self.napis_sudoku)
-
-        menu_layout = QHBoxLayout()
-        menu_layout.setSpacing(30)
-        menu_layout.addStretch(1)
-
-        style_boxa = f"""
-             QGroupBox {{
-                font-family: 'Segoe UI';
-                font-size: 24px;
-                font-weight: bold;
-                color: {rgb(51, 65, 85)};
-                background-color: {rgb(248, 249, 250)};
-                border: 1px solid {rgb(226, 232, 240)};
-                border-radius: 15px;
-                margin-top: 35px;
-            }}
-            QGroupBox::title {{
-                subcontrol-origin: margin;
-                subcontrol-position: top center;
-                padding: 0 15px;
-            }}
-        """
-
-        # ---------------- REJESTRACJA ----------------
-
-        kolumna1 = QVBoxLayout()
-        kolumna1.setSpacing(12)
-        kolumna1.setContentsMargins(20, 15, 20, 15)
-
-        self.grupa1 = QGroupBox(self.translate("registration"))
-        self.grupa1.setStyleSheet(style_boxa)
-        self.grupa1.setFixedSize(420, 230)
-
-        self.napis_nazwa_swoja = QLabel(self.translate("enter_name"))
-        self.napis_nazwa_swoja.setStyleSheet(
-            f"font-family: 'Segoe UI'; font-size: 18px; "
-            f"color: {rgb(100, 116, 139)}; font-weight: normal; "
-            f"background-color: transparent;"
-        )
-        kolumna1.addWidget(self.napis_nazwa_swoja)
-
-        self.lineedit_nazwa_swoja = QLineEdit()
-        self.lineedit_nazwa_swoja.setFixedHeight(42)
-        self.lineedit_nazwa_swoja.setPlaceholderText(self.translate("your_name"))
-        self.lineedit_nazwa_swoja.setStyleSheet(
-            f"""
-            QLineEdit {{
-                padding-left: 15px;
-                padding-right: 15px;
-                font-size: 20px;
-                border: 1px solid {rgb(203, 213, 225)};
-                border-radius: 8px;
-                background: {rgb(255, 255, 255)};
-                color: {rgb(0, 0, 0)};
-            }}
-            QLineEdit::placeholder {{
-                color: {rgb(148, 163, 184)};
-            }}
-            """
-        )
-        self.lineedit_nazwa_swoja.setMaxLength(15)
-        kolumna1.addWidget(self.lineedit_nazwa_swoja)
-
-        self.etykieta_jezyk = QLabel(self.translate("language_label"))
-        self.etykieta_jezyk.setStyleSheet(
-            f"font-family: 'Segoe UI'; font-size: 18px; "
-            f"color: {rgb(100, 116, 139)}; font-weight: normal; "
-            f"background-color: transparent;"
-        )
-        kolumna1.addWidget(self.etykieta_jezyk)
-
-        self.pasek_jezyka = QHBoxLayout()
-        self.pasek_jezyka.setSpacing(12)
-
-        self.przycisk_pl = QPushButton("Polski")
-        self.przycisk_ua = QPushButton("Українська")
-        self.przycisk_en = QPushButton("English")
-
-        style_language_button = f"""
-            QPushButton {{
-                background-color: {rgb(248, 249, 250)};
+            self.ekran_menu = QWidget()
+    
+            layout_strony = QVBoxLayout()
+            layout_strony.setContentsMargins(50, 25, 50, 30)
+            layout_strony.setSpacing(20)
+            layout_strony.addSpacing(10)
+    
+            self.napis_sudoku = QLabel(self.translate("sudoku_title"))
+            self.napis_sudoku.setAlignment(Qt.AlignCenter)
+            self.napis_sudoku.setStyleSheet(f"""
+                font-family: 'Segoe UI', sans-serif;
+                font-size: 64px;
+                font-weight: 900;
                 color: {rgb(30, 41, 59)};
-                font-size: 16px;
-                font-weight: bold;
-                border-radius: 10px;
-                border: 1px solid {rgb(203, 213, 225)};
-            }}
-            QPushButton:hover {{
-                background-color: {rgb(226, 232, 240)};
-            }}
-        """
-
-        self.przycisk_pl.setFixedSize(100, 36)
-        self.przycisk_ua.setFixedSize(150, 36)
-        self.przycisk_en.setFixedSize(110, 36)
-
-        for btn in [self.przycisk_pl, self.przycisk_ua, self.przycisk_en]:
-            btn.setStyleSheet(style_language_button)
-            self.pasek_jezyka.addWidget(btn)
-
-        self.przycisk_pl.clicked.connect(lambda: self.setJezyk("pl"))
-        self.przycisk_ua.clicked.connect(lambda: self.setJezyk("ua"))
-        self.przycisk_en.clicked.connect(lambda: self.setJezyk("en"))
-
-        self.pasek_jezyka.addStretch(1)
-        kolumna1.addLayout(self.pasek_jezyka)
-
-        self.grupa1.setLayout(kolumna1)
-        menu_layout.addWidget(self.grupa1, alignment=Qt.AlignTop)
-
-        # ---------------- POZIOM TRUDNOŚCI ----------------
-
-        kolumna2 = QVBoxLayout()
-        kolumna2.setSpacing(12)
-        kolumna2.setContentsMargins(20, 15, 20, 15)
-
-        self.grupa2 = QGroupBox(self.translate("difficulty_level"))
-        self.grupa2.setStyleSheet(style_boxa)
-        self.grupa2.setFixedSize(420, 230)
-
-        self.radio_latwy = QRadioButton(self.translate("easy"))
-        self.radio_sredni = QRadioButton(self.translate("medium"))
-        self.radio_trudny = QRadioButton(self.translate("hard"))
-        self.radio_sredni.setChecked(True)
-
-        style_radio = f"""
-            QRadioButton {{
-                font-family: 'Segoe UI';
-                font-size: 20px;
-                color: {rgb(40, 40, 40)};
-                font-weight: normal;
-                background-color: {rgb(255, 255, 255)};
-                border-radius: 10px;
-                border: 1px solid {rgb(220, 220, 220)};
-                padding-left: 15px;
-            }}
-            QRadioButton:hover {{
-                background-color: {rgb(245, 245, 245)};
-            }}
-            QRadioButton::indicator {{
-                width: 22px;
-                height: 22px;
-            }}
-        """
-
-        for rb in [self.radio_latwy, self.radio_sredni, self.radio_trudny]:
-            rb.setFixedHeight(42)
-            rb.setStyleSheet(style_radio)
-            kolumna2.addWidget(rb)
-
-        self.grupa2.setLayout(kolumna2)
-        menu_layout.addWidget(self.grupa2, alignment=Qt.AlignTop)
-
-        menu_layout.addStretch(1)
-
-        layout_strony.addLayout(menu_layout, stretch=0)
-        layout_strony.addSpacing(90)
-
-        # ---------------- PRZYCISK START ----------------
-
-        layout_przycisku = QHBoxLayout()
-        layout_przycisku.addStretch(1)
-
-        self.przycisk_start = QPushButton(self.translate("start_game"))
-        self.przycisk_start.setFixedSize(480, 55)
-        self.przycisk_start.setStyleSheet(
-            f"""
-            QPushButton {{
-                background-color: {rgb(30, 41, 59)};
-                color: {rgb(255, 255, 255)};
-                font-size: 24px;
-                font-weight: bold;
-                border-radius: 12px;
-            }}
-            QPushButton:hover {{
-                background-color: {rgb(51, 65, 85)};
-            }}
+                letter-spacing: 10px;
+                margin-bottom: 0px;
+            """)
+            layout_strony.addWidget(self.napis_sudoku)
+    
+            menu_layout = QHBoxLayout()
+            menu_layout.setSpacing(30)
+            menu_layout.addStretch(1)
+    
+            style_boxa = f"""
+                 QGroupBox {{
+                    font-family: 'Segoe UI';
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: {rgb(51, 65, 85)};
+                    background-color: {rgb(248, 249, 250)};
+                    border: 1px solid {rgb(226, 232, 240)};
+                    border-radius: 15px;
+                    margin-top: 35px;
+                }}
+                QGroupBox::title {{
+                    subcontrol-origin: margin;
+                    subcontrol-position: top center;
+                    padding: 0 15px;
+                }}
             """
-        )
-
-        self.przycisk_start.clicked.connect(self.uruchom_gre)
-
-        layout_przycisku.addWidget(self.przycisk_start)
-        layout_przycisku.addStretch(1)
-
-        layout_strony.addLayout(layout_przycisku)
-        layout_strony.addStretch(1)
-
-        self.ekran_menu.setStyleSheet(f"background-color: {rgb(162, 171, 31)};")
-        self.ekran_menu.setLayout(layout_strony)
-        self.stos_ekranow.addWidget(self.ekran_menu)
+    
+            # ---------------- REJESTRACJA ----------------
+    
+            kolumna1 = QVBoxLayout()
+            kolumna1.setSpacing(12)
+            kolumna1.setContentsMargins(20, 15, 20, 15)
+    
+            self.grupa1 = QGroupBox(self.translate("registration"))
+            self.grupa1.setStyleSheet(style_boxa)
+            self.grupa1.setFixedSize(420, 230)
+    
+            self.napis_nazwa_swoja = QLabel(self.translate("enter_name"))
+            self.napis_nazwa_swoja.setStyleSheet(
+                f"font-family: 'Segoe UI'; font-size: 18px; "
+                f"color: {rgb(100, 116, 139)}; font-weight: normal; "
+                f"background-color: transparent;"
+            )
+            kolumna1.addWidget(self.napis_nazwa_swoja)
+    
+            self.lineedit_nazwa_swoja = QLineEdit()
+            self.lineedit_nazwa_swoja.setFixedHeight(42)
+            self.lineedit_nazwa_swoja.setPlaceholderText(self.translate("your_name"))
+            self.lineedit_nazwa_swoja.setStyleSheet(
+                f"""
+                QLineEdit {{
+                    padding-left: 15px;
+                    padding-right: 15px;
+                    font-size: 20px;
+                    border: 1px solid {rgb(203, 213, 225)};
+                    border-radius: 8px;
+                    background: {rgb(255, 255, 255)};
+                    color: {rgb(0, 0, 0)};
+                }}
+                QLineEdit::placeholder {{
+                    color: {rgb(148, 163, 184)};
+                }}
+                """
+            )
+            self.lineedit_nazwa_swoja.setMaxLength(15)
+            kolumna1.addWidget(self.lineedit_nazwa_swoja)
+    
+            self.etykieta_jezyk = QLabel(self.translate("language_label"))
+            self.etykieta_jezyk.setStyleSheet(
+                f"font-family: 'Segoe UI'; font-size: 18px; "
+                f"color: {rgb(100, 116, 139)}; font-weight: normal; "
+                f"background-color: transparent;"
+            )
+            kolumna1.addWidget(self.etykieta_jezyk)
+    
+            self.pasek_jezyka = QHBoxLayout()
+            self.pasek_jezyka.setSpacing(12)
+    
+            self.przycisk_pl = QPushButton("Polski")
+            self.przycisk_ua = QPushButton("Українська")
+            self.przycisk_en = QPushButton("English")
+    
+            style_language_button = f"""
+                QPushButton {{
+                    background-color: {rgb(248, 249, 250)};
+                    color: {rgb(30, 41, 59)};
+                    font-size: 16px;
+                    font-weight: bold;
+                    border-radius: 10px;
+                    border: 1px solid {rgb(203, 213, 225)};
+                }}
+                QPushButton:hover {{
+                    background-color: {rgb(226, 232, 240)};
+                }}
+            """
+    
+            self.przycisk_pl.setFixedSize(100, 36)
+            self.przycisk_ua.setFixedSize(150, 36)
+            self.przycisk_en.setFixedSize(110, 36)
+    
+            for btn in [self.przycisk_pl, self.przycisk_ua, self.przycisk_en]:
+                btn.setStyleSheet(style_language_button)
+                self.pasek_jezyka.addWidget(btn)
+    
+            self.przycisk_pl.clicked.connect(lambda: self.setJezyk("pl"))
+            self.przycisk_ua.clicked.connect(lambda: self.setJezyk("ua"))
+            self.przycisk_en.clicked.connect(lambda: self.setJezyk("en"))
+    
+            self.pasek_jezyka.addStretch(1)
+            kolumna1.addLayout(self.pasek_jezyka)
+    
+            self.grupa1.setLayout(kolumna1)
+            menu_layout.addWidget(self.grupa1, alignment=Qt.AlignTop)
+    
+            # ---------------- POZIOM TRUDNOŚCI ----------------
+    
+            kolumna2 = QVBoxLayout()
+            kolumna2.setSpacing(12)
+            kolumna2.setContentsMargins(20, 15, 20, 15)
+    
+            self.grupa2 = QGroupBox(self.translate("difficulty_level"))
+            self.grupa2.setStyleSheet(style_boxa)
+            self.grupa2.setFixedSize(420, 230)
+    
+            self.radio_latwy = QRadioButton(self.translate("easy"))
+            self.radio_sredni = QRadioButton(self.translate("medium"))
+            self.radio_trudny = QRadioButton(self.translate("hard"))
+            self.radio_sredni.setChecked(True)
+    
+            style_radio = f"""
+                QRadioButton {{
+                    font-family: 'Segoe UI';
+                    font-size: 20px;
+                    color: {rgb(40, 40, 40)};
+                    font-weight: normal;
+                    background-color: {rgb(255, 255, 255)};
+                    border-radius: 10px;
+                    border: 1px solid {rgb(220, 220, 220)};
+                    padding-left: 15px;
+                }}
+                QRadioButton:hover {{
+                    background-color: {rgb(245, 245, 245)};
+                }}
+                QRadioButton::indicator {{
+                    width: 22px;
+                    height: 22px;
+                }}
+            """
+    
+            for rb in [self.radio_latwy, self.radio_sredni, self.radio_trudny]:
+                rb.setFixedHeight(42)
+                rb.setStyleSheet(style_radio)
+                kolumna2.addWidget(rb)
+    
+            self.grupa2.setLayout(kolumna2)
+            menu_layout.addWidget(self.grupa2, alignment=Qt.AlignTop)
+    
+            menu_layout.addStretch(1)
+    
+            layout_strony.addLayout(menu_layout, stretch=0)
+            layout_strony.addSpacing(90)
+    
+            # ---------------- PRZYCISK START ----------------
+    
+            layout_przycisku = QHBoxLayout()
+            layout_przycisku.addStretch(1)
+    
+            self.przycisk_start = QPushButton(self.translate("start_game"))
+            self.przycisk_start.setFixedSize(480, 55)
+            self.przycisk_start.setStyleSheet(
+                f"""
+                QPushButton {{
+                    background-color: {rgb(30, 41, 59)};
+                    color: {rgb(255, 255, 255)};
+                    font-size: 24px;
+                    font-weight: bold;
+                    border-radius: 12px;
+                }}
+                QPushButton:hover {{
+                    background-color: {rgb(51, 65, 85)};
+                }}
+                """
+            )
+    
+            self.przycisk_start.clicked.connect(self.uruchom_gre)
+    
+            layout_przycisku.addWidget(self.przycisk_start)
+            layout_przycisku.addStretch(1)
+    
+            layout_strony.addLayout(layout_przycisku)
+            layout_strony.addStretch(1)
+    
+            self.ekran_menu.setStyleSheet(f"background-color: {rgb(162, 171, 31)};")
+            self.ekran_menu.setLayout(layout_strony)
+            self.stos_ekranow.addWidget(self.ekran_menu)
 
     def initGraUI(self):
         self.ekran_gry = QWidget()
