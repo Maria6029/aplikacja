@@ -36,6 +36,10 @@ LANGUAGES = {
         "instruction_btn": "Co to tryb notatek?",
         "instruction_desc": "Tryb notatek to funkcja, która ma ułatwić Ci rozgrywkę. Po jej włączeniu każda wpisana cyfra staje się jedynie małą notatką w prawym górnym rogu pola. Możesz wpisać kilka cyfr jednocześnie lub w dowolnym momencie je skasować. Nie są one traktowane jako ostateczna odpowiedź. By usunąć wpisaną już cyfrę, ponownie ją naciśnij, a zniknie.",
         "surrender_button": "PODDAJĘ SIĘ\n(Zakończ)",
+        "hint_button": "Podpowiedź: {}",
+        "hint_no_more": "Nie masz już podpowiedzi.",
+        "hint_choose_cell": "Najpierw kliknij puste pole na planszy.",
+        "hint_start_cell": "Nie można użyć podpowiedzi na polu startowym.",
         "game_won": "WYGRANA !",
         "game_lost": "PRZEGRANA",
         "ranking_window_title": "Ranking Graczy - Sudoku",
@@ -67,6 +71,10 @@ LANGUAGES = {
         "instruction_btn": "Що таке режим нотаток?",
         "instruction_desc": "Режим нотаток – це funkcja, яка полегшить вам гру. Після його увімкнення кожна введена cyfra стає лише маленькою заміткою у правому верхньому кутку клітинки. Ви можете ввести кілька цифр одночасно або видалити їх у будь-який момент. Вони не вважаються остаточною відповіддю. Щоб видалити вже введену цифру, просто натисніть її ще раз, і вона зникне.",
         "surrender_button": "ЗДАЮСЯ\n(Завершити)",
+        "hint_button": "Підказка: {}",
+        "hint_no_more": "У тебе більше немає підказок.",
+        "hint_choose_cell": "Спочатку натисни порожнє поле на дошці.",
+        "hint_start_cell": "Не можна використати підказку на початковому полі.",
         "game_won": "ПЕРЕМОГА!",
         "game_lost": "ПОРАЗКА",
         "ranking_window_title": "Рейтинг гравців - Судоку",
@@ -79,6 +87,7 @@ LANGUAGES = {
         "polish": "Польська",
         "ukrainian": "Українська",
         "english": "Англійська"
+       
     },
     "en": {
         "window_title": "Sudoku",
@@ -98,6 +107,10 @@ LANGUAGES = {
         "instruction_btn": "What is notes mode?",
         "instruction_desc": "Notes mode is a feature designed to make your gameplay easier. When enabled, each entered digit becomes just a small note in the top right corner of the cell. You can type multiple digits at once or delete them at any time. They are not treated as a final answer. To remove an already entered digit, simply press it again, and it will disappear.",
         "surrender_button": "I GIVE UP\n(End)",
+        "hint_button": "Hint: {}",
+        "hint_no_more": "You have no hints left.",
+        "hint_choose_cell": "First click an empty cell on the board.",
+        "hint_start_cell": "You cannot use a hint on a starting cell.",
         "game_won": "VICTORY!",
         "game_lost": "DEFEAT",
         "ranking_window_title": "Player Ranking - Sudoku",
@@ -110,6 +123,7 @@ LANGUAGES = {
         "polish": "Polish",
         "ukrainian": "Ukrainian",
         "english": "English"
+        
     }
 }
 
@@ -251,8 +265,9 @@ class GlowneOkno(QMainWindow):
         
         self.czas_startu = 0
         self.zycia = 3
+       
         self.gra_zakonczona = False
-        
+        elf.liczba_podpowiedzi = 3
         self.initUI()     
         self.initGraUI()  
 
