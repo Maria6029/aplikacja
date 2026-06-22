@@ -338,6 +338,7 @@ class GlowneOkno(QMainWindow):
         self.lineedit_nazwa_swoja = QLineEdit()
         self.lineedit_nazwa_swoja.setPlaceholderText(self.translate("your_name"))
         self.lineedit_nazwa_swoja.setStyleSheet(f"QLineEdit {{ padding: 18px; font-size: 20px; border: 1px solid {rgb(203, 213, 225)}; border-radius: 8px; background: {rgb(255, 255, 255)}; color: {rgb(0, 0, 0)}; }} QLineEdit::placeholder {{ color: {rgb(148, 163, 184)}; }}")
+        self.lineedit_nazwa_swoja.setMaxLength(15)
         kolumna1.addWidget(self.lineedit_nazwa_swoja)
 
         self.etykieta_jezyk = QLabel(self.translate("language_label"))
