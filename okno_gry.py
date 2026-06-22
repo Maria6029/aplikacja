@@ -33,6 +33,8 @@ LANGUAGES = {
         "back_to_menu": "Wróć do Menu",
         "lives_label": "Życia: {}",
         "notes_mode": "Tryb Notatek",
+        "instruction_btn": "Co to tryb notatek?",
+        "instruction_desc": "Tryb notatek to funkcja, która ma ułatwić Ci rozgrywkę. Po jej włączeniu każda wpisana cyfra staje się jedynie małą notatką w prawym górnym rogu pola. Możesz wpisać kilka cyfr jednocześnie lub w dowolnym momencie je skasować. Nie są one traktowane jako ostateczna odpowiedź. By usunąć wpisaną już cyfrę, ponownie ją naciśnij, a zniknie.",
         "surrender_button": "PODDAJĘ SIĘ\n(Zakończ)",
         "game_won": "WYGRANA !",
         "game_lost": "PRZEGRANA",
@@ -62,6 +64,8 @@ LANGUAGES = {
         "back_to_menu": "Повернутися до меню",
         "lives_label": "Життя: {}",
         "notes_mode": "Режим нотаток",
+        "instruction_btn": "Що таке режим нотаток?",
+        "instruction_desc": "Режим нотаток – це funkcja, яка полегшить вам гру. Після його увімкнення кожна введена cyfra стає лише маленькою заміткою у правому верхньому кутку клітинки. Ви можете ввести кілька цифр одночасно або видалити їх у будь-який момент. Вони не вважаються остаточною відповіддю. Щоб видалити вже введену цифру, просто натисніть її ще раз, і вона зникне.",
         "surrender_button": "ЗДАЮСЯ\n(Завершити)",
         "game_won": "ПЕРЕМОГА!",
         "game_lost": "ПОРАЗКА",
@@ -91,6 +95,8 @@ LANGUAGES = {
         "back_to_menu": "Back to Menu",
         "lives_label": "Lives: {}",
         "notes_mode": "Notes Mode",
+        "instruction_btn": "What is notes mode?",
+        "instruction_desc": "Notes mode is a feature designed to make your gameplay easier. When enabled, each entered digit becomes just a small note in the top right corner of the cell. You can type multiple digits at once or delete them at any time. They are not treated as a final answer. To remove an already entered digit, simply press it again, and it will disappear.",
         "surrender_button": "I GIVE UP\n(End)",
         "game_won": "VICTORY!",
         "game_lost": "DEFEAT",
@@ -277,7 +283,9 @@ class GlowneOkno(QMainWindow):
         self.przycisk_zakoncz.setText(self.translate("surrender_button"))
         self.etykieta_czasu.setText(self.translate("time_label").format("00:00"))
         self.zaktualizuj_widok_zyc()
-
+        self.przycisk_instrukcja.setText(self.translate("instruction_btn"))
+        self.etykieta_opis_notatek.setText(self.translate("instruction_desc"))
+        
         if hasattr(self, 'ekran_gry') and self.stos_ekranow.currentWidget() == self.ekran_gry:
             self.etykieta_czasu.setText(self.translate("time_label").format("00:00"))
             self.zaktualizuj_widok_zyc()
@@ -440,40 +448,38 @@ class GlowneOkno(QMainWindow):
         """)
         lewy_panel.addWidget(self.checkbox_notatki)
 
-        self.przycisk_instrukcja = QPushButton("Co to tryb notatek?")
+        self.przycisk_instrukcja = QPushButton(self.translate("instruction_btn"))
         self.przycisk_instrukcja.setStyleSheet(f"""
-                    QPushButton {{ 
-                        background-color: {rgb(30, 41, 59)}; 
-                        color: white; 
-                        font-size: 14px; 
-                        font-weight: bold; 
-                        padding: 8px; 
-                        border-radius: 8px; 
-                        margin-top: 10px; 
-                    }}
-                    QPushButton:hover {{ background-color: {rgb(51, 65, 85)}; }}
-                """)
+            QPushButton {{ 
+                background-color: {rgb(30, 41, 59)}; 
+                color: white; 
+                font-size: 14px; 
+                font-weight: bold; 
+                padding: 8px; 
+                border-radius: 8px; 
+                margin-top: 10px; 
+            }}
+            QPushButton:hover {{ background-color: {rgb(51, 65, 85)}; }}
+        """)
         lewy_panel.addWidget(self.przycisk_instrukcja)
 
-        self.etykieta_opis_notatek = QLabel(
-            "Tryb notatek to funkcja, która ma ułatwić Ci rozgrywkę. Po jej włączeniu "
-            "każda wpisana cyfra staje się jedynie małą notatką w prawym górnym rogu pola. "
-            "Możesz wpisać kilka cyfr jednocześnie lub w dowolnym momencie je skasować. "
-            "Nie są one traktowane jako ostateczna odpowiedź. By usunąć wpisaną już cyfrę, "
-            "ponownie ją naciśnij, a zniknie."
-        )
+        self.etykieta_opis_notatek = QLabel(self.translate("instruction_desc"))
         self.etykieta_opis_notatek.setWordWrap(True)
         self.etykieta_opis_notatek.setFixedWidth(200)
         self.etykieta_opis_notatek.setStyleSheet(f"""
-                    font-family: 'Segoe UI'; font-size: 13px; color: {rgb(51, 65, 85)};
-                    margin-top: 5px; margin-bottom: 5px; background-color: transparent;
-                """)
+            font-family: 'Segoe UI'; font-size: 13px; color: {rgb(51, 65, 85)};
+            margin-top: 5px; margin-bottom: 5px; background-color: transparent;
+        """)
         self.etykieta_opis_notatek.setVisible(False)
         lewy_panel.addWidget(self.etykieta_opis_notatek)
         def przelacz_instrukcje():
             stan_obecny = self.etykieta_opis_notatek.isVisible()
             self.etykieta_opis_notatek.setVisible(not stan_obecny)
+
         self.przycisk_instrukcja.clicked.connect(przelacz_instrukcje)
+
+
+        
         self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
         self.przycisk_zakoncz.setStyleSheet(f"""
             QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
