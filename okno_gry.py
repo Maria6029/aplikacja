@@ -439,7 +439,48 @@ class GlowneOkno(QMainWindow):
             QCheckBox::indicator {{ width: 25px; height: 25px; }}
         """)
         lewy_panel.addWidget(self.checkbox_notatki)
-        
+
+        self.przycisk_instrukcja = QPushButton("Co to tryb notatek?")
+        self.przycisk_instrukcja.setStyleSheet(f"""
+                    QPushButton {{ 
+                        background-color: {rgb(30, 41, 59)}; 
+                        color: white; 
+                        font-size: 14px; 
+                        font-weight: bold; 
+                        padding: 8px; 
+                        border-radius: 8px; 
+                        margin-top: 10px; 
+                    }}
+                    QPushButton:hover {{ background-color: {rgb(51, 65, 85)}; }}
+                """)
+        lewy_panel.addWidget(self.przycisk_instrukcja)
+
+        self.etykieta_opis_notatek = QLabel(
+            "Tryb notatek to funkcja, która ma ułatwić Ci rozgrywkę. Po jej włączeniu "
+            "każda wpisana cyfra staje się jedynie małą notatką w prawym górnym rogu pola. "
+            "Możesz wpisać kilka cyfr jednocześnie lub w dowolnym momencie je skasować. "
+            "Nie są one traktowane jako ostateczna odpowiedź. By usunąć wpisaną już cyfrę, "
+            "ponownie ją naciśnij, a zniknie."
+        )
+        self.etykieta_opis_notatek.setWordWrap(True)
+        self.etykieta_opis_notatek.setFixedWidth(200)
+        self.etykieta_opis_notatek.setStyleSheet(f"""
+                    font-family: 'Segoe UI'; font-size: 13px; color: {rgb(51, 65, 85)};
+                    margin-top: 5px; margin-bottom: 5px; background-color: transparent;
+                """)
+        self.etykieta_opis_notatek.setVisible(False)
+        lewy_panel.addWidget(self.etykieta_opis_notatek)
+        def przelacz_instrukcje():
+            stan_obecny = self.etykieta_opis_notatek.isVisible()
+            self.etykieta_opis_notatek.setVisible(not stan_obecny)
+        self.przycisk_instrukcja.clicked.connect(przelacz_instrukcje)
+        self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
+        self.przycisk_zakoncz.setStyleSheet(f"""
+            QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
+            QPushButton:hover {{ background-color: rgb(185, 28, 28); }}
+        """)
+        self.przycisk_zakoncz.clicked.connect(lambda: self.zakoncz_gre(wygrana=False))
+
         self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
         self.przycisk_zakoncz.setStyleSheet(f"""
             QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
