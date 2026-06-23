@@ -49,6 +49,8 @@ LANGUAGES = {
         "time": "Czas",
         "anonymous": "Anonim",
         "language_label": "Wybierz język:",
+        "instructions_title": "Instrukcja Gry",
+        "instructions_content": "Witaj w Sudoku!\nTwoim zadaniem jest uzupełnienie planszy cyframi od 1 do 9 tak, aby każda cyfra występowała tylko raz w każdym wierszu, kolumnie oraz w każdym kwadracie 3×3",
     },
     "ua": {
         "window_title": "Судоку",
@@ -81,7 +83,8 @@ LANGUAGES = {
         "time": "Час",
         "anonymous": "Анонім",
         "language_label": "Оберіть мову:",
-       
+        "instructions_title": "Інструкція Гри",
+        "instructions_content": "Вітаємо в Судоку!\nВашим завданням є заповнити дошку цифрами від 1 до 9 так, щоб кожна цифра з'являлась лише один раз у кожному рядку, стовпці та квадраті 3×3",
     },
     "en": {
         "window_title": "Sudoku",
@@ -114,7 +117,8 @@ LANGUAGES = {
         "time": "Time",
         "anonymous": "Anonymous",
         "language_label": "Choose language:",
-        
+        "instructions_title": "Game Instructions",
+        "instructions_content": "Welcome to Sudoku!\nYour task is to fill the board with digits from 1 to 9 so that each digit appears only once in each row, column, and 3×3 square.",
     }
 }
 
@@ -291,6 +295,9 @@ class GlowneOkno(QMainWindow):
         self.zaktualizuj_widok_zyc()
         self.przycisk_instrukcja.setText(self.translate("instruction_btn"))
         self.etykieta_opis_notatek.setText(self.translate("instruction_desc"))
+        self.przycisk_instrukcja_menu.setText(self.translate("instructions_title"))
+        self.grupa3.setTitle(self.translate("instructions_title"))
+        self.etykieta_instrukcja.setText(self.translate("instructions_content"))
         
         if hasattr(self, 'ekran_gry') and self.stos_ekranow.currentWidget() == self.ekran_gry:
             self.etykieta_czasu.setText(self.translate("time_label").format("00:00"))
@@ -480,7 +487,7 @@ class GlowneOkno(QMainWindow):
         menu_layout.addStretch(1)
     
         layout_strony.addLayout(menu_layout, stretch=0)
-        layout_strony.addSpacing(90)
+        layout_strony.addSpacing(20)
     
             # ---------------- PRZYCISK START ----------------
     
@@ -510,7 +517,69 @@ class GlowneOkno(QMainWindow):
         layout_przycisku.addStretch(1)
     
         layout_strony.addLayout(layout_przycisku)
-        layout_strony.addStretch(1)
+        
+        # --------------- PRZYCISK INSTRUKCJI ----------------
+        layout_instrukcji = QHBoxLayout()
+        layout_instrukcji.addStretch(1)
+        
+        self.przycisk_instrukcja_menu = QPushButton(self.translate("instructions_title"))
+        self.przycisk_instrukcja_menu.setFixedSize(480, 45)
+        self.przycisk_instrukcja_menu.setStyleSheet(
+            f"""
+            QPushButton {{
+                background-color: {rgb(71, 85, 105)};
+                color: {rgb(255, 255, 255)};
+                font-size: 18px;
+                font-weight: bold;
+                border-radius: 10px;
+                margin-top: 15px;
+            }}
+            QPushButton:hover {{
+                background-color: {rgb(51, 65, 85)};
+            }}
+            """
+        )
+        layout_instrukcji.addWidget(self.przycisk_instrukcja_menu)
+        layout_instrukcji.addStretch(1)
+        
+        layout_strony.addLayout(layout_instrukcji)
+        
+        # --------------- KAFELEK INSTRUKCJI ----------------
+        layout_kafelka = QHBoxLayout()
+        layout_kafelka.addStretch(1)
+        
+        self.grupa3 = QGroupBox(self.translate("instructions_title"))
+        self.grupa3.setStyleSheet(style_boxa)
+        self.grupa3.setFixedWidth(480)
+        
+        kolumna3 = QVBoxLayout()
+        kolumna3.setSpacing(12)
+        kolumna3.setContentsMargins(20, 15, 20, 15)
+        
+        self.etykieta_instrukcja = QLabel(self.translate("instructions_content"))
+        self.etykieta_instrukcja.setWordWrap(True)
+        self.etykieta_instrukcja.setStyleSheet(
+            f"font-family: 'Segoe UI'; font-size: 12px; "
+            f"color: {rgb(51, 65, 85)}; font-weight: normal; "
+            f"background-color: transparent; line-height: 1.4;"
+        )
+        kolumna3.addWidget(self.etykieta_instrukcja)
+        
+        self.grupa3.setLayout(kolumna3)
+        self.grupa3.setVisible(False)
+        
+        layout_kafelka.addWidget(self.grupa3)
+        layout_kafelka.addStretch(1)
+        
+        layout_strony.addLayout(layout_kafelka)
+        
+        def przelacz_instrukcje_menu():
+            stan_obecny = self.grupa3.isVisible()
+            self.grupa3.setVisible(not stan_obecny)
+        
+        self.przycisk_instrukcja_menu.clicked.connect(przelacz_instrukcje_menu)
+        
+        layout_strony.addSpacing(10)
     
         self.ekran_menu.setStyleSheet(f"background-color: {rgb(162, 171, 31)};")
         self.ekran_menu.setLayout(layout_strony)
