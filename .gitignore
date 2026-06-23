@@ -1,3 +1,6 @@
+# Lokalny plik wyników (od teraz zapisuje się w bezpiecznym AppData użytkownika)
+ranking.json
+
 # Tymczasowe pliki i foldery Pythona
 __pycache__/
 *.pyc
@@ -8,7 +11,7 @@ __pycache__/
 venv/
 env/
 .env
+.venv/
 
 # Pliki konfiguracyjne samego VS Code (żeby nie nadpisywać sobie ustawień edytora)
 .vscode/
-.venv/
