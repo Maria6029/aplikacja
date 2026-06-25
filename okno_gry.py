@@ -785,42 +785,45 @@ class GlowneOkno(QMainWindow):
         Gracz może użyć maksymalnie 3 podpowiedzi."""
         if self.gra_zakonczona:
             return
-    
+
         if self.liczba_podpowiedzi <= 0:
             QMessageBox.information(self, "Podpowiedź", self.translate("hint_no_more"))
             return
-    
-        if not hasattr(self, "akt_wiersz") or not hasattr(self, "akt_kolumna"):
+
+        #Sprawdzenie, czy gracz w ogóle wybrał jakąś komórkę
+        if not hasattr(self, 'akt_wiersz') or not hasattr(self, 'akt_kolumna'):
             QMessageBox.information(self, "Podpowiedź", self.translate("hint_choose_cell"))
             return
-    
+
         wiersz = self.akt_wiersz
         kolumna = self.akt_kolumna
         komorka = self.komorki[wiersz][kolumna]
-    
+
+        #Sprawdzenie, czy to nie jest pole startowe 
         if komorka.wygenerowane:
             QMessageBox.information(self, "Podpowiedź", self.translate("hint_start_cell"))
             return
-    
+
         poprawna_cyfra = self.poprawna_plansza[wiersz][kolumna]
-    
+
         komorka.wartosc = str(poprawna_cyfra)
         komorka.notatki.clear()
         komorka.czy_bledna = False
         komorka.odgadnieta = True
+        komorka.setText(str(poprawna_cyfra)) 
         komorka.odswiez_tekst()
-    
+
+        #Aktualizacja głównej planszy gry
         self.aktualna_plansza[wiersz][kolumna] = poprawna_cyfra
-    
+        #Aktualizacja licznika i przycisku
         self.liczba_podpowiedzi -= 1
         self.przycisk_podpowiedz.setText(self.translate("hint_button").format(self.liczba_podpowiedzi))
-    
-        if self.liczba_podpowiedzi == 0:
+
+        if self.liczba_podpowiedzi <= 0:
             self.przycisk_podpowiedz.setEnabled(False)
-    
+
         self.odswiez_obecne_podswietlenie()
         self.sprawdz_stan_gry()
-        
     def sprawdz_stan_gry(self):
         if self.gra_zakonczona: return
         self.odswiez_obecne_podswietlenie()
