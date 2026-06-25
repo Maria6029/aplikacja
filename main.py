@@ -1,14 +1,11 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt, QTimer
-
-# Importujemy zintegrowane i spolszczone główne okno z interfejsem gry
 from okno_gry import GlowneOkno
 
 
 def main():
     # Globalne włączenie skalowania High DPI dla wszystkich systemów operacyjnych.
-    # Zapobiega to ucinaniu okien lub ich "gigantycznym" rozmiarom na ekranach Mac/Huawei.
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 

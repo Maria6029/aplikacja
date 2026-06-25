@@ -1,132 +1,101 @@
 import copy
 import random
+from typing import List, Tuple, Set, Optional
 
 class Plansza:
-    def czy_rozwiazana(self):
-        """Sprawdza, czy plansza Sudoku jest rozwiązana.
+    """Klasa reprezentująca planszę i logikę gry Sudoku."""
+
+    def czy_rozwiazana(self) -> bool:
+        """
+        Sprawdza, czy plansza Sudoku jest rozwiązana.
         Zwraca True, jeśli nie ma pustych pól ani błędów.
         """
-        # brak pustych pól
         for wiersz in range(9):
             for kolumna in range(9):
                 if self.plansza[wiersz][kolumna] == 0:
                     return False
 
-        # brak błędów
-        if len(self.pobierz_bledy()) > 0:
+        if self.pobierz_bledy():
             return False
 
         return True
 
-    def pobierz_bledy(self):
-        """Sprawdza całą planszę i zwraca zbiór pól,
-        w których wpisane liczby są niezgodne z zasadami Sudoku.
+    def pobierz_bledy(self) -> Set[Tuple[int, int]]:
+        """
+        Sprawdza całą planszę i zwraca zbiór współrzędnych pól,
+        w których wpisane liczby łamią zasady Sudoku.
         """
         bledy = set()
 
         for wiersz in range(9):
             for kolumna in range(9):
                 liczba = self.plansza[wiersz][kolumna]
-
                 if liczba == 0:
                     continue
 
-                # tymczasowo usuwamy liczbę
                 self.plansza[wiersz][kolumna] = 0
-
                 if not self.sprawdz_pole(liczba, (wiersz, kolumna)):
                     bledy.add((wiersz, kolumna))
-
-                # przywracamy
                 self.plansza[wiersz][kolumna] = liczba
 
         return bledy
 
-    def __init__(self, kod=None):
-        """Tworzy nowy obiekt planszy Sudoku.
-        Jeśli podano kod planszy, wczytuje go do tablicy 9x9.
-        """
+    def __init__(self, kod: Optional[str] = None) -> None:
+        """Tworzy nowy obiekt planszy Sudoku."""
         self.__resetuj_plansze()
+        self.kod = kod
 
         if kod:
-            self.kod = kod
-
             for wiersz in range(9):
                 for kolumna in range(9):
                     self.plansza[wiersz][kolumna] = int(kod[0])
                     kod = kod[1:]
-        else:
-            self.kod = None
 
-    def __resetuj_plansze(self):
-        """Resetuje planszę Sudoku, ustawiając wszystkie pola na 0.
-        Zero oznacza puste pole."""
-        self.plansza = [
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-        ]
+    def __resetuj_plansze(self) -> List[List[int]]:
+        """Resetuje planszę, ustawiając wszystkie pola na 0."""
+        self.plansza = [[0] * 9 for _ in range(9)]
         return self.plansza
 
-    def plansza_na_kod(self, wejsciowa_plansza=None): 
-        """Zamienia planszę Sudoku na jeden ciąg znaków.
-        Jeśli podano planszę jako argument, zamienia ją na kod.
-        W przeciwnym razie zamienia aktualną planszę.
-        """
-        if wejsciowa_plansza:
-            _kod = ''.join([str(i) for j in wejsciowa_plansza for i in j])
-            return _kod
-        else:
-            self.kod = ''.join([str(i) for j in self.plansza for i in j])
-            return self.kod
+    def plansza_na_kod(self, wejsciowa_plansza: Optional[List[List[int]]] = None) -> str:
+        """Zamienia planszę Sudoku na jeden ciąg znaków."""
+        plansza_do_zamiany = wejsciowa_plansza if wejsciowa_plansza else self.plansza
+        self.kod = ''.join([str(liczba) for wiersz in plansza_do_zamiany for liczba in wiersz])
+        return self.kod
 
-    def znajdz_puste_pole(self): 
-        """Szuka pierwszego pustego pola na planszy.
-        Puste pole jest oznaczone liczbą 0.
-        """
-        for wiersz in range(len(self.plansza)):
-            for kolumna in range(len(self.plansza[0])):
+    def znajdz_puste_pole(self) -> Optional[Tuple[int, int]]:
+        """Szuka pierwszego pustego pola (0) na planszy."""
+        for wiersz in range(9):
+            for kolumna in range(9):
                 if self.plansza[wiersz][kolumna] == 0:
                     return (wiersz, kolumna)
+        return None
 
-        return False
+    def sprawdz_pole(self, liczba: int, pozycja: Tuple[int, int]) -> bool:
+        """Sprawdza, czy daną liczbę można wpisać w wybrane pole."""
+        wiersz, kolumna = pozycja
 
-    def sprawdz_pole(self, liczba, pozycja): 
-        """Sprawdza, czy daną liczbę można wpisać w wybrane pole.
-        Kontroluje wiersz, kolumnę oraz kwadrat 3x3.
-        """
-        if not self.plansza[pozycja[0]][pozycja[1]] == 0:  
+        if self.plansza[wiersz][kolumna] != 0:
             return False
 
-        for kolumna in self.plansza[pozycja[0]]:  
-            if kolumna == liczba:
+        if liczba in self.plansza[wiersz]:
+            return False
+
+        for i in range(9):
+            if self.plansza[i][kolumna] == liczba:
                 return False
 
-        for wiersz in range(len(self.plansza)):  
-            if self.plansza[wiersz][pozycja[1]] == liczba:
-                return False
+        start_wiersz = (wiersz // 3) * 3
+        start_kolumna = (kolumna // 3) * 3
 
-        wewnetrzny_kwadrat_wiersz = pozycja[0] // 3
-        wewnetrzny_kwadrat_kolumna = pozycja[1] // 3
-
-        for i in range(3):  
+        for i in range(3):
             for j in range(3):
-                if self.plansza[i + (wewnetrzny_kwadrat_wiersz * 3)][j + (wewnetrzny_kwadrat_kolumna * 3)] == liczba:
+                if self.plansza[start_wiersz + i][start_kolumna + j] == liczba:
                     return False
 
         return True
 
-    def rozwiaz(self): 
-        """
-        Rozwiązuje planszę Sudoku metodą rekurencji i cofania.
-        Zwraca rozwiązaną planszę albo False, jeśli nie da się jej rozwiązać.
-        """
+    def rozwiaz(self) -> bool:
+        """Rozwiązuje planszę Sudoku metodą rekurencji i cofania (backtracking)."""
         dostepne_pola = self.znajdz_puste_pole()
 
         if not dostepne_pola:
@@ -137,78 +106,61 @@ class Plansza:
         for n in range(1, 10):
             if self.sprawdz_pole(n, (wiersz, kolumna)):
                 self.plansza[wiersz][kolumna] = n
-
                 if self.rozwiaz():
-                    return self.plansza
-
+                    return True
                 self.plansza[wiersz][kolumna] = 0
 
         return False
 
-    def rozwiaz_na_kod(self): 
-        """Rozwiązuje planszę Sudoku i zwraca rozwiązanie jako ciąg znaków.
-        """
-        return self.plansza_na_kod(self.rozwiaz())
+    def rozwiaz_na_kod(self) -> str:
+        """Rozwiązuje planszę Sudoku i zwraca rozwiązanie jako kod."""
+        self.rozwiaz()
+        return self.plansza_na_kod()
 
-    def __generuj_losowa_pelna_plansze(self):  
-        """Generuje nową, kompletną i poprawnie uzupełnioną planszę Sudoku.
-        Najpierw losowo wypełnia trzy kwadraty 3x3, a potem uzupełnia resztę.
-        """
-        self.__resetuj_plansze()
-
-        _l = list(range(1, 10))
+    def __wypelnij_kwadrat(self, wiersz_start: int, kolumna_start: int) -> None:
+        """Pomocnicza metoda (Faza 3) usuwająca duplikację kodu z generatora."""
+        liczby = list(range(1, 10))
+        random.shuffle(liczby)
         for wiersz in range(3):
             for kolumna in range(3):
-                _liczba = random.choice(_l)
-                self.plansza[wiersz][kolumna] = _liczba
-                _l.remove(_liczba)
+                self.plansza[wiersz_start + wiersz][kolumna_start + kolumna] = liczby.pop()
 
-        _l = list(range(1, 10))
-        for wiersz in range(3, 6):
-            for kolumna in range(3, 6):
-                _liczba = random.choice(_l)
-                self.plansza[wiersz][kolumna] = _liczba
-                _l.remove(_liczba)
+    def __generuj_losowa_pelna_plansze(self) -> List[List[int]]:
+        """Generuje całkowicie nową planszę losując główne przekątne."""
+        self.__resetuj_plansze()
+        # Wypełnianie po przekątnej (bezpieczne, niezależne kwadraty)
+        self.__wypelnij_kwadrat(0, 0)
+        self.__wypelnij_kwadrat(3, 3)
+        self.__wypelnij_kwadrat(6, 6)
+        
+        self.__generuj_kontynuacje()
+        return self.plansza
 
-        _l = list(range(1, 10))
-        for wiersz in range(6, 9):
-            for kolumna in range(6, 9):
-                _liczba = random.choice(_l)
-                self.plansza[wiersz][kolumna] = _liczba
-                _l.remove(_liczba)
-
-        return self.__generuj_kontynuacje()
-
-    def __generuj_kontynuacje(self): 
-        """Kontynuuje generowanie pełnej planszy Sudoku.
-        Uzupełnia puste pola losowymi liczbami zgodnymi z zasadami gry.
-        """
-        for wiersz in range(len(self.plansza)):
-            for kolumna in range(len(self.plansza[wiersz])):
+    def __generuj_kontynuacje(self) -> bool:
+        """Dokończenie generowania pełnej planszy za pomocą rekurencji."""
+        for wiersz in range(9):
+            for kolumna in range(9):
                 if self.plansza[wiersz][kolumna] == 0:
-                    _liczba = random.randint(1, 9)
+                    liczby = list(range(1, 10))
+                    random.shuffle(liczby)
+                    for liczba in liczby:
+                        if self.sprawdz_pole(liczba, (wiersz, kolumna)):
+                            self.plansza[wiersz][kolumna] = liczba
+                            if self.rozwiaz():
+                                self.__generuj_kontynuacje()
+                                return True
+                            self.plansza[wiersz][kolumna] = 0
+                    return False
+        return True
 
-                    if self.sprawdz_pole(_liczba, (wiersz, kolumna)):
-                        self.plansza[wiersz][kolumna] = _liczba
-
-                        if self.rozwiaz():
-                            self.__generuj_kontynuacje()
-                            return self.plansza
-
-                        self.plansza[wiersz][kolumna] = 0
-
-        return False
-
-
-    def __szukaj_rozwiazan_rekurencja(self, rozwiazania):
-        """Pomocnicza funkcja rekurencyjna do zliczania rozwiązań."""
-        # Przerywamy natychmiast, gdy znajdziemy drugie rozwiązanie
+    def __szukaj_rozwiazan_rekurencja(self, rozwiazania: List[str]) -> None:
+        """Rekurencyjne zliczanie ilości unikalnych rozwiązań."""
         if len(rozwiazania) > 1:
             return 
 
         pole = self.znajdz_puste_pole()
         if not pole:
-            rozwiazania.append("znalazlem") # Dodajemy cokolwiek do listy, by zliczyć rozwiązanie
+            rozwiazania.append("znalazlem")
             return
 
         wiersz, kolumna = pole
@@ -216,107 +168,61 @@ class Plansza:
             if self.sprawdz_pole(n, (wiersz, kolumna)):
                 self.plansza[wiersz][kolumna] = n
                 self.__szukaj_rozwiazan_rekurencja(rozwiazania)
-                self.plansza[wiersz][kolumna] = 0 # Cofamy krok po powrocie
+                self.plansza[wiersz][kolumna] = 0
 
-    def znajdz_liczbe_rozwiazan(self): 
-        """Szuka możliwych rozwiązań aktualnej planszy.
-        """
+    def znajdz_liczbe_rozwiazan(self) -> List[str]:
+        """Zwraca listę reprezentującą znalezione rozwiązania."""
         rozwiazania = []
         self.__szukaj_rozwiazan_rekurencja(rozwiazania)
         return rozwiazania
 
-
-    def generuj_plansze_gry(self, pelna_plansza, trudnosc): 
-        """Tworzy planszę do gry na podstawie pełnej rozwiązanej planszy.
-        Usuwa określoną liczbę pól w zależności od poziomu trudności.
-        """ 
+    def generuj_plansze_gry(self, pelna_plansza: List[List[int]], trudnosc: int) -> Tuple[List[List[int]], List[List[int]]]:
+        """Tworzy zagrażalną planszę na podstawie pełnej, usuwając odpowiednią ilość pól."""
         self.plansza = copy.deepcopy(pelna_plansza)
 
         if trudnosc == 0:
-            _pola_do_usuniecia = 36
+            pola_do_usuniecia = 36
         elif trudnosc == 1:
-            _pola_do_usuniecia = 46
-        elif trudnosc == 2:
-            _pola_do_usuniecia = 52
+            pola_do_usuniecia = 46
         else:
-            return
+            pola_do_usuniecia = 52
 
-        _licznik = 0
-        while _licznik < 4:
-            _losowy_wiersz = random.randint(0, 2)
-            _losowa_kolumna = random.randint(0, 2)
-            if self.plansza[_losowy_wiersz][_losowa_kolumna] != 0:
-                self.plansza[_losowy_wiersz][_losowa_kolumna] = 0
-                _licznik += 1
+        usuwanie_bezpieczne = min(12, pola_do_usuniecia)
+        licznik = 0
+        while licznik < usuwanie_bezpieczne:
+            wiersz = random.randint(0, 8)
+            kolumna = random.randint(0, 8)
+            if self.plansza[wiersz][kolumna] != 0:
+                self.plansza[wiersz][kolumna] = 0
+                licznik += 1
 
-        _licznik = 0
-        while _licznik < 4:
-            _losowy_wiersz = random.randint(3, 5)
-            _losowa_kolumna = random.randint(3, 5)
-            if self.plansza[_losowy_wiersz][_losowa_kolumna] != 0:
-                self.plansza[_losowy_wiersz][_losowa_kolumna] = 0
-                _licznik += 1
+        pola_do_usuniecia -= usuwanie_bezpieczne
+        licznik = 0
+        while licznik < pola_do_usuniecia:
+            wiersz = random.randint(0, 8)
+            kolumna = random.randint(0, 8)
 
-        _licznik = 0
-        while _licznik < 4:
-            _losowy_wiersz = random.randint(6, 8)
-            _losowa_kolumna = random.randint(6, 8)
-            if self.plansza[_losowy_wiersz][_losowa_kolumna] != 0:
-                self.plansza[_losowy_wiersz][_losowa_kolumna] = 0
-                _licznik += 1
-
-        _pola_do_usuniecia -= 12
-        _licznik = 0
-        while _licznik < _pola_do_usuniecia:
-            _wiersz = random.randint(0, 8)
-            _kolumna = random.randint(0, 8)
-
-            if self.plansza[_wiersz][_kolumna] != 0:
-                n = self.plansza[_wiersz][_kolumna]
-                self.plansza[_wiersz][_kolumna] = 0
+            if self.plansza[wiersz][kolumna] != 0:
+                n = self.plansza[wiersz][kolumna]
+                self.plansza[wiersz][kolumna] = 0
 
                 if len(self.znajdz_liczbe_rozwiazan()) != 1:
-                    self.plansza[_wiersz][_kolumna] = n
+                    self.plansza[wiersz][kolumna] = n
                     continue
 
-                _licznik += 1
+                licznik += 1
 
         return self.plansza, pelna_plansza
 
-    def generuj_kod_planszy_gry(self, trudnosc): 
-        """Generuje nową planszę Sudoku do gry oraz jej rozwiązanie.
-        Zwraca oba elementy jako kody tekstowe.
-        """
-        self.plansza, _rozwiazana_plansza = self.generuj_plansze_gry(self.__generuj_losowa_pelna_plansze(), trudnosc)
-        return self.plansza_na_kod(), self.plansza_na_kod(_rozwiazana_plansza)
+    def generuj_kod_planszy_gry(self, trudnosc: int) -> Tuple[str, str]:
+        """Generuje nową planszę Sudoku do gry oraz jej ukryte rozwiązanie w formacie kodu."""
+        self.plansza, rozwiazana_plansza = self.generuj_plansze_gry(self.__generuj_losowa_pelna_plansze(), trudnosc)
+        return self.plansza_na_kod(), self.plansza_na_kod(rozwiazana_plansza)
 
-    def wypisz_plansze(self):
-        """Wypisuje aktualną planszę Sudoku w konsoli.
-        Każdy wiersz planszy jest drukowany osobno.
-        """
+    def wypisz_plansze(self) -> None:
+        """Wypisuje aktualną planszę Sudoku w konsoli (do debugowania)."""
         for i in range(9):
-            wiersz = ""
-            for j in range(9):
-                wartosc = self.plansza[i][j]
-                wiersz += str(wartosc) + " "
-            print(wiersz)
-
-if __name__ == "__main__":
-    plansza_obiekt = Plansza()
-
-    kody_planszy_gry = plansza_obiekt.generuj_kod_planszy_gry(0)
-
-    print("KOD (ciąg znaków):")
-    print(kody_planszy_gry[0])
-
-    print("\nPLANSZA (2D):")
-    plansza_obiekt.wypisz_plansze()
-    zablokowane_komorki = set()
-
-    for wiersz in range(9):
-        for kolumna in range(9):
-            if plansza_obiekt.plansza[wiersz][kolumna] != 0:
-                zablokowane_komorki.add((wiersz, kolumna))
+            print(" ".join(str(self.plansza[i][j]) for j in range(9)))
 
 
 

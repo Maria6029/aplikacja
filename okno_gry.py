@@ -140,6 +140,7 @@ class SudokuCell(QLineEdit):
         self.wygenerowane = False
         self.odgadnieta = False
         self.czy_bledna = False 
+        self.poprzednie_bledy = set()  # Pamięć błędów popełnionych w tym konkretnym polu
         
         self.setAlignment(Qt.AlignCenter)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -202,6 +203,11 @@ class SudokuCell(QLineEdit):
                     self.notatki.clear()
                     self.glowne_okno.aktualna_plansza[self.row][self.col] = int(klawisz_tekst)
                 else:
+                    # Ignorowanie powtarzania tego samego błędu (Faza 3)
+                    if klawisz_tekst in self.poprzednie_bledy:
+                        return
+                    self.poprzednie_bledy.add(klawisz_tekst)
+
                     self.odgadnieta = False
                     self.czy_bledna = True
                     zyje = self.glowne_okno.odejmij_zycie()
@@ -231,6 +237,7 @@ class SudokuCell(QLineEdit):
         self.odgadnieta = False
         self.czy_bledna = False
         self.notatki.clear()
+        self.poprzednie_bledy.clear() # Czyścimy pamięć błędów przy nowej grze
         self.odswiez_tekst()
 
     def odswiez_tekst(self):
@@ -518,7 +525,7 @@ class GlowneOkno(QMainWindow):
     
         layout_strony.addLayout(layout_przycisku)
         
-        # --------------- PRZYCISK INSTRUKCJI ----------------
+        # PRZYCISK INSTRUKCJI
         layout_instrukcji = QHBoxLayout()
         layout_instrukcji.addStretch(1)
         
@@ -544,7 +551,7 @@ class GlowneOkno(QMainWindow):
         
         layout_strony.addLayout(layout_instrukcji)
         
-        # --------------- KAFELEK INSTRUKCJI ----------------
+        # KAFELEK INSTRUKCJI
         layout_kafelka = QHBoxLayout()
         layout_kafelka.addStretch(1)
         
@@ -671,15 +678,6 @@ class GlowneOkno(QMainWindow):
 
         self.przycisk_instrukcja.clicked.connect(przelacz_instrukcje)
 
-
-        
-        self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
-        self.przycisk_zakoncz.setStyleSheet(f"""
-            QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
-            QPushButton:hover {{ background-color: rgb(185, 28, 28); }}
-        """)
-        self.przycisk_zakoncz.clicked.connect(lambda: self.zakoncz_gre(wygrana=False))
-
         self.przycisk_zakoncz = QPushButton(self.translate("surrender_button"))
         self.przycisk_zakoncz.setStyleSheet(f"""
             QPushButton {{ background-color: rgb(220, 38, 38); color: white; font-size: 16px; font-weight: bold; padding: 15px; border-radius: 10px; margin-top: 30px; }}
@@ -690,6 +688,10 @@ class GlowneOkno(QMainWindow):
 
         lewy_panel.addStretch()
         layout_glowny_gry.addLayout(lewy_panel)
+
+        # BLOKADA KRADZIEŻY FOKUSU
+        for btn in [self.przycisk_wroc, self.checkbox_notatki, self.przycisk_podpowiedz, self.przycisk_instrukcja, self.przycisk_zakoncz]:
+            btn.setFocusPolicy(Qt.NoFocus)
 
         # PLANSZA
         self.siatka_gry = QGridLayout()
@@ -722,6 +724,7 @@ class GlowneOkno(QMainWindow):
     def uruchom_gre(self):
         self.czas_startu = timeit.default_timer()
         self.gra_zakonczona = False
+        self.ekran_gry.setEnabled(True) # Odblokowanie ekranu po poprzedniej grze
         
         self.etykieta_czasu.setText(self.translate("time_label").format("00:00"))
         self.stoper.start(1000)
@@ -736,13 +739,12 @@ class GlowneOkno(QMainWindow):
         if self.radio_latwy.isChecked(): trudnosc = 0
         elif self.radio_trudny.isChecked(): trudnosc = 2
 
-        # ---------------- ZMIANA ----------------
+        # ZMIANA
         generator = Plansza()
         kod_gry, kod_rozwiazania = generator.generuj_kod_planszy_gry(trudnosc)
         
         self.aktualna_plansza = [[int(kod_gry[r*9 + c]) for c in range(9)] for r in range(9)]
         self.poprawna_plansza = [[int(kod_rozwiazania[r*9 + c]) for c in range(9)] for r in range(9)]
-        # ----------------------------------------
 
         for wiersz in range(9):
             for kolumna in range(9):
@@ -777,50 +779,48 @@ class GlowneOkno(QMainWindow):
             self.zakoncz_gre(wygrana=False)
             return False
         return True
+        
     def uzyj_podpowiedzi(self):
         """Wpisuje poprawną cyfrę w aktualnie wybrane pole.
         Gracz może użyć maksymalnie 3 podpowiedzi."""
         if self.gra_zakonczona:
             return
-
+    
         if self.liczba_podpowiedzi <= 0:
             QMessageBox.information(self, "Podpowiedź", self.translate("hint_no_more"))
             return
-
-        #Sprawdzenie, czy gracz w ogóle wybrał jakąś komórkę
-        if not hasattr(self, 'akt_wiersz') or not hasattr(self, 'akt_kolumna'):
+    
+        if not hasattr(self, "akt_wiersz") or not hasattr(self, "akt_kolumna"):
             QMessageBox.information(self, "Podpowiedź", self.translate("hint_choose_cell"))
             return
-
+    
         wiersz = self.akt_wiersz
         kolumna = self.akt_kolumna
         komorka = self.komorki[wiersz][kolumna]
-
-        #Sprawdzenie, czy to nie jest pole startowe 
+    
         if komorka.wygenerowane:
             QMessageBox.information(self, "Podpowiedź", self.translate("hint_start_cell"))
             return
-
+    
         poprawna_cyfra = self.poprawna_plansza[wiersz][kolumna]
-
+    
         komorka.wartosc = str(poprawna_cyfra)
         komorka.notatki.clear()
         komorka.czy_bledna = False
         komorka.odgadnieta = True
-        komorka.setText(str(poprawna_cyfra)) 
         komorka.odswiez_tekst()
-
-        #Aktualizacja głównej planszy gry
+    
         self.aktualna_plansza[wiersz][kolumna] = poprawna_cyfra
-        #Aktualizacja licznika i przycisku
+    
         self.liczba_podpowiedzi -= 1
         self.przycisk_podpowiedz.setText(self.translate("hint_button").format(self.liczba_podpowiedzi))
-
-        if self.liczba_podpowiedzi <= 0:
+    
+        if self.liczba_podpowiedzi == 0:
             self.przycisk_podpowiedz.setEnabled(False)
-
+    
         self.odswiez_obecne_podswietlenie()
         self.sprawdz_stan_gry()
+        
     def sprawdz_stan_gry(self):
         if self.gra_zakonczona: return
         self.odswiez_obecne_podswietlenie()
@@ -843,6 +843,7 @@ class GlowneOkno(QMainWindow):
         self.gra_zakonczona = True
         
         self.stoper.stop()
+        self.ekran_gry.setEnabled(False) # Zamrożenie gry
         
         for r in range(9):
             for c in range(9):
@@ -871,12 +872,15 @@ class GlowneOkno(QMainWindow):
                 padding: 0px;
             """)
 
-        QTimer.singleShot(3000, lambda: self.przejdz_do_rankingu(wygrana))
+        # Zmniejszony czas czekania
+        QTimer.singleShot(1000, lambda: self.przejdz_do_rankingu(wygrana))
 
     def przejdz_do_rankingu(self, wygrana):
         """
         Pokazuje ranking ZAWSZE. Ale tylko dla zwycięzców zapisuje nowy czas.
         """
+        self.stos_ekranow.setCurrentWidget(self.ekran_menu)
+
         if self.radio_latwy.isChecked(): poziom = "Łatwy"
         elif self.radio_trudny.isChecked(): poziom = "Trudny"
         else: poziom = "Średni"
@@ -889,8 +893,6 @@ class GlowneOkno(QMainWindow):
             manager_rankingu = RankingManager()
             okno_wynikow = RankingOkno(manager_rankingu, domyslny_poziom=poziom, jezyk=self.jezyk, parent=self)
             okno_wynikow.exec_()
-            
-        self.stos_ekranow.setCurrentWidget(self.ekran_menu)
 
     def ustaw_styl_komorki(self, komorka, r, c, kolor_tla, czy_blad=False):
         top = "3px solid black" if r % 3 == 0 else "1px solid #cbd5e1"
