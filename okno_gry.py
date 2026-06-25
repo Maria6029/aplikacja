@@ -130,6 +130,7 @@ class SudokuCell(QLineEdit):
     fokus_otrzymany = pyqtSignal(int, int)
 
     def __init__(self, row, col, glowne_okno, parent=None):
+        """Konstruktor komórki sudoku"""
         super().__init__(parent)
         self.row = row
         self.col = col
@@ -152,10 +153,17 @@ class SudokuCell(QLineEdit):
         self.setCursor(Qt.ArrowCursor)
 
     def focusInEvent(self, event):
+         """ Obsługuje kliknięcie lub wejścia fokusu w komórkę.
+            Informuje główne okno, która komórka planszy została aktualnie wybrana.
+            """
         super().focusInEvent(event)
         self.fokus_otrzymany.emit(self.row, self.col)
 
     def keyPressEvent(self, event):
+        """ Obsługuje naciśnięcia klawiszy w komórce Sudoku.
+        Pozwala poruszać się po planszy za pomocą strzałek oraz klawiszy W, A, S, D.
+        Po wykryciu odpowiedniego klawisza przenosi fokus na sąsiednią komórkę.
+        """
         klawisz_qt = event.key()
 
         # nawigacja strzałkami i wsad
@@ -227,6 +235,12 @@ class SudokuCell(QLineEdit):
         self.glowne_okno.sprawdz_stan_gry()
 
     def ustaw_poczatkowa(self, val):
+         """ Ustawia początkową wartość komórki Sudoku.
+            Jeśli wartość jest różna od zera, komórka staje się polem wygenerowanym
+            i nie jest traktowana jako pole do odgadnięcia. Jeśli wartość wynosi zero,
+            komórka pozostaje pusta. Funkcja czyści też notatki i zapamiętane błędy
+            przy rozpoczęciu nowej gry.
+            """
         if val != 0:
             self.wartosc = str(val)
             self.wygenerowane = True
@@ -241,6 +255,11 @@ class SudokuCell(QLineEdit):
         self.odswiez_tekst()
 
     def odswiez_tekst(self):
+         """ Odświeża tekst wyświetlany w komórce.
+            Jeśli komórka ma wpisaną wartość, pokazuje ją na środku pola.
+            Jeśli nie ma wartości, ale ma notatki, pokazuje je w prawym górnym rogu.
+            Jeśli komórka jest pusta i nie ma notatek, czyści jej zawartość.
+            """
         if self.wartosc:
             self.setText(self.wartosc)
             self.setAlignment(Qt.AlignCenter)
@@ -277,9 +296,17 @@ class GlowneOkno(QMainWindow):
         self.initGraUI()
 
     def translate(self, key):
+        """
+        Zwraca tłumaczenie tekstu na aktualnie wybrany język.
+        """
         return self.translations.get(self.jezyk, {}).get(key, key)
 
     def setJezyk(self, jezyk):
+         """ Zmienia język interfejsu gry.
+        Jeśli wybrany język istnieje i jest inny niż obecny, funkcja aktualizuje
+        teksty widoczne w oknie, między innymi tytuł, etykiety, przyciski,
+        poziomy trudności oraz tryb notatek.
+        """
         if jezyk not in self.translations or self.jezyk == jezyk:
             return
         self.jezyk = jezyk
@@ -311,6 +338,11 @@ class GlowneOkno(QMainWindow):
             self.zaktualizuj_widok_zyc()
             
     def wycentruj_okno(self):
+        """
+        Ustawia okno aplikacji na środku ekranu.
+        Pobiera rozmiar dostępnego ekranu, oblicza środek
+        i przesuwa okno tak, aby było wycentrowane.
+        """
         ekran = QApplication.primaryScreen()
         geometria_ekranu = ekran.availableGeometry()
     
@@ -320,6 +352,9 @@ class GlowneOkno(QMainWindow):
         self.move(geometria_okna.topLeft())
         
     def initUI(self):
+        """
+        Tworzy i konfiguruje interfejs użytkownika.
+        """
         self.ekran_menu = QWidget()
     
         layout_strony = QVBoxLayout()
@@ -581,6 +616,11 @@ class GlowneOkno(QMainWindow):
         layout_strony.addLayout(layout_kafelka)
         
         def przelacz_instrukcje_menu():
+            """
+            Pokazuje albo ukrywa sekcję z instrukcją w menu.
+            Jeśli instrukcja jest aktualnie widoczna, funkcja ją chowa.
+            Jeśli jest ukryta, funkcja ją pokazuje.
+            """
             stan_obecny = self.grupa3.isVisible()
             self.grupa3.setVisible(not stan_obecny)
         
@@ -593,6 +633,7 @@ class GlowneOkno(QMainWindow):
         self.stos_ekranow.addWidget(self.ekran_menu)
 
     def initGraUI(self):
+         """Tworzy i konfiguruje ekran gry."""
         self.ekran_gry = QWidget()
         self.ekran_gry.setStyleSheet(f"background-color: {rgb(162, 171, 31)};")
         
@@ -673,6 +714,11 @@ class GlowneOkno(QMainWindow):
         self.etykieta_opis_notatek.setVisible(False)
         lewy_panel.addWidget(self.etykieta_opis_notatek)
         def przelacz_instrukcje():
+            """
+            Pokazuje albo ukrywa opis trybu notatek.
+            Jeśli opis jest aktualnie widoczny, funkcja go chowa.
+            Jeśli jest ukryty, funkcja go pokazuje.
+            """
             stan_obecny = self.etykieta_opis_notatek.isVisible()
             self.etykieta_opis_notatek.setVisible(not stan_obecny)
 
@@ -722,6 +768,12 @@ class GlowneOkno(QMainWindow):
         self.stos_ekranow.addWidget(self.ekran_gry)
 
     def uruchom_gre(self):
+        """
+        RozpoSczyna nową grę Sudoku.
+        Resetuje czas, liczbę żyć i podpowiedzi, odblokowuje ekran gry,
+        wybiera poziom trudności, generuje nową planszę oraz wpisuje wartości
+        początkowe do komórek.
+        """
         self.czas_startu = timeit.default_timer()
         self.gra_zakonczona = False
         self.ekran_gry.setEnabled(True) # Odblokowanie ekranu po poprzedniej grze
@@ -757,6 +809,11 @@ class GlowneOkno(QMainWindow):
         self.stos_ekranow.setCurrentWidget(self.ekran_gry)
 
     def aktualizuj_czas(self):
+        """
+        Aktualizuje licznik czasu gry.
+        Jeśli gra nie jest zakończona, oblicza liczbę sekund od startu gry,
+        zamienia ją na minuty i sekundy, a następnie wyświetla czas w etykiecie.
+        """
         if self.gra_zakonczona:
             return
         sekundy_minely = int(timeit.default_timer() - self.czas_startu)
@@ -765,11 +822,17 @@ class GlowneOkno(QMainWindow):
         self.etykieta_czasu.setText(self.translate("time_label").format(f"{minuty:02d}:{sekundy:02d}"))
 
     def zaktualizuj_widok_zyc(self):
+        """
+        Aktualizuje graficzny widok liczby żyć gracza.
+        Pokazuje czerwone serca dla pozostałych żyć oraz czarne serca
+        dla utraconych żyć.
+        """
         czerwone = "<span style='color: #ef4444;'>♥</span>" * self.zycia
         czarne = "<span style='color: #64748b;'>♥</span>" * (3 - self.zycia)
         self.etykieta_zycia.setText(self.translate("lives_label").format(f"{czerwone}{czarne}"))
 
     def odejmij_zycie(self):
+        """Odejmuje jedno życie graczowi po popełnieniu błędu."""
         if self.gra_zakonczona: return False
         
         self.zycia -= 1
@@ -825,6 +888,10 @@ class GlowneOkno(QMainWindow):
         self.odswiez_obecne_podswietlenie()
         self.sprawdz_stan_gry()
     def sprawdz_stan_gry(self):
+        """
+        Sprawdza, czy gracz poprawnie uzupełnił całą planszę.
+        Jeśli wszystkie pola są uzupełnione poprawnie, kończy grę jako wygraną.
+        """
         if self.gra_zakonczona: return
         self.odswiez_obecne_podswietlenie()
 
@@ -842,6 +909,12 @@ class GlowneOkno(QMainWindow):
             self.zakoncz_gre(wygrana=True)
 
     def zakoncz_gre(self, wygrana=True):
+        """
+        Kończy aktualną rozgrywkę.
+        Zatrzymuje stoper, blokuje ekran gry, ustawia wszystkie komórki jako tylko do odczytu
+        oraz zmienia ich wygląd. W zależności od wyniku przygotowuje komunikat
+        o wygranej albo przegranej.
+        """
         if self.gra_zakonczona: return
         self.gra_zakonczona = True
         
