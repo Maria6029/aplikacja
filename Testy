@@ -1,0 +1,668 @@
+#Testy ranking czasu
+import json
+import pytest
+
+import Ranking_czasow
+from Ranking_czasow import RankingManager, RankingOkno, translate
+
+
+def test_translate_zwraca_tlumaczenie():
+    assert translate("pl", "time") == "Czas"
+    assert translate("en", "time") == "Time"
+    assert translate("ua", "time") == "Час"
+
+
+def test_translate_zwraca_klucz_gdy_brak_tlumaczenia():
+    assert translate("pl", "nie_istnieje") == "nie_istnieje"
+    assert translate("xx", "time") == "time"
+
+
+def test_wczytaj_ranking_gdy_plik_nie_istnieje(tmp_path):
+    plik = tmp_path / "ranking.json"
+
+    manager = RankingManager(str(plik))
+
+    assert manager.wyniki == {
+        "Łatwy": {},
+        "Średni": {},
+        "Trudny": {},
+    }
+
+
+def test_dodaj_wynik_twody_plik_json(tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    manager.dodaj_wynik("Olek", "Średni", 123)
+
+    assert plik.exists()
+
+    with open(plik, "r", encoding="utf-8") as f:
+        dane = json.load(f)
+
+    assert dane["Średni"]["Olek"] == 123
+
+
+def test_dodaj_wynik_przycina_puste_znaki_w_imieniu(tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    manager.dodaj_wynik("  Olek  ", "Łatwy", 90)
+
+    assert "Olek" in manager.wyniki["Łatwy"]
+    assert manager.wyniki["Łatwy"]["Olek"] == 90
+
+
+def test_dodaj_wynik_puste_imie_zamienia_na_anonim(tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    manager.dodaj_wynik("   ", "Łatwy", 90)
+
+    assert "Anonim" in manager.wyniki["Łatwy"]
+    assert manager.wyniki["Łatwy"]["Anonim"] == 90
+
+
+def test_dodaj_wynik_zachowuje_lepszy_czas_tego_samego_gracza(tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    manager.dodaj_wynik("Olek", "Średni", 200)
+    manager.dodaj_wynik("Olek", "Średni", 150)
+
+    assert manager.wyniki["Średni"]["Olek"] == 150
+
+
+def test_dodaj_wynik_nie_nadpisuje_gorszym_czasem(tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    manager.dodaj_wynik("Olek", "Średni", 150)
+    manager.dodaj_wynik("Olek", "Średni", 200)
+
+    assert manager.wyniki["Średni"]["Olek"] == 150
+
+
+def test_dodaj_wynik_dodaje_nowy_poziom_jesli_brakuje(tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    manager.dodaj_wynik("Olek", "Ekspert", 300)
+
+    assert "Ekspert" in manager.wyniki
+    assert manager.wyniki["Ekspert"]["Olek"] == 300
+
+
+def test_pobierz_posortowany_ranking_sortuje_rosnaco_po_czasie(tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    manager.dodaj_wynik("Zosia", "Trudny", 300)
+    manager.dodaj_wynik("Ania", "Trudny", 120)
+    manager.dodaj_wynik("Bartek", "Trudny", 200)
+
+    wynik = manager.pobierz_posortowany_ranking("Trudny")
+
+    assert wynik == [
+        ("Ania", 120),
+        ("Bartek", 200),
+        ("Zosia", 300),
+    ]
+
+
+def test_wczytaj_ranking_z_istniejacego_pliku(tmp_path):
+    plik = tmp_path / "ranking.json"
+    dane = {
+        "Łatwy": {"Ala": 50},
+        "Średni": {"Olek": 120},
+        "Trudny": {"Kasia": 300},
+    }
+
+    with open(plik, "w", encoding="utf-8") as f:
+        json.dump(dane, f, ensure_ascii=False)
+
+    manager = RankingManager(str(plik))
+
+    assert manager.wyniki == dane
+
+
+def test_ranking_okno_formatuje_czas(app, qtbot, tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    okno = RankingOkno(manager)
+    qtbot.addWidget(okno)
+
+    assert okno.formatuj_czas(0) == "00:00"
+    assert okno.formatuj_czas(5) == "00:05"
+    assert okno.formatuj_czas(65) == "01:05"
+    assert okno.formatuj_czas(605) == "10:05"
+
+
+def test_ranking_okno_tworzy_trzy_zakladki(app, qtbot, tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    okno = RankingOkno(manager, domyslny_poziom="Średni", jezyk="pl")
+    qtbot.addWidget(okno)
+
+    assert okno.zakladki.count() == 3
+    assert okno.zakladki.tabText(0) == "Łatwy"
+    assert okno.zakladki.tabText(1) == "Średni"
+    assert okno.zakladki.tabText(2) == "Trudny"
+    assert okno.zakladki.currentIndex() == 1
+
+
+def test_ranking_okno_wypelnia_tabele_danymi(app, qtbot, tmp_path):
+    plik = tmp_path / "ranking.json"
+    manager = RankingManager(str(plik))
+
+    manager.dodaj_wynik("Ania", "Łatwy", 45)
+    manager.dodaj_wynik("Tomek", "Łatwy", 125)
+
+    okno = RankingOkno(manager, domyslny_poziom="Łatwy", jezyk="pl")
+    qtbot.addWidget(okno)
+
+    tabela = okno.tabele_widzety["Łatwy"]
+
+    assert tabela.rowCount() == 2
+    assert tabela.item(0, 0).text() == "#1"
+    assert tabela.item(0, 1).text() == "Ania"
+    assert tabela.item(0, 2).text() == "00:45"
+    assert tabela.item(1, 1).text() == "Tomek"
+    assert tabela.item(1, 2).text() == "02:05"
+
+
+def test_gra_zakonczona_sukcesem_zapisuje_czas_i_poziom(monkeypatch, tmp_path):
+    plik = tmp_path / "ranking.json"
+    zapisane_okna = []
+
+    class FakeLineEdit:
+        def text(self):
+            return "Olek"
+
+    class FakeRadio:
+        def __init__(self, checked=False):
+            self._checked = checked
+
+        def isChecked(self):
+            return self._checked
+
+    class FakeOknoStartowe:
+        lineedit_nazwa_swoja = FakeLineEdit()
+        radio_latwy = FakeRadio(False)
+        radio_trudny = FakeRadio(True)
+
+    class FakeRankingManager(RankingManager):
+        def __init__(self):
+            super().__init__(str(plik))
+
+    class FakeRankingOkno:
+        def __init__(self, manager, domyslny_poziom="Średni", jezyk="pl", parent=None):
+            zapisane_okna.append((manager, domyslny_poziom))
+
+        def exec_(self):
+            return 0
+
+    monkeypatch.setattr(Ranking_czasow.timeit, "default_timer", lambda: 142.0)
+    monkeypatch.setattr(Ranking_czasow, "RankingManager", FakeRankingManager)
+    monkeypatch.setattr(Ranking_czasow, "RankingOkno", FakeRankingOkno)
+
+    Ranking_czasow.gra_zakonczona_sukcesem(FakeOknoStartowe(), czas_startu=100.0)
+
+    manager, poziom = zapisane_okna[0]
+
+    assert poziom == "Trudny"
+    assert manager.wyniki["Trudny"]["Olek"] == 42
+#testy genereator
+from generator import Plansza
+
+
+POPRAWNY_KOD = (
+    "534678912"
+    "672195348"
+    "198342567"
+    "859761423"
+    "426853791"
+    "713924856"
+    "961537284"
+    "287419635"
+    "345286179"
+)
+
+
+def kod_na_plansze(kod):
+    return [[int(kod[r * 9 + c]) for c in range(9)] for r in range(9)]
+
+
+def czy_poprawne_sudoku(kod):
+    plansza = kod_na_plansze(kod)
+
+    wymagane = set(range(1, 10))
+
+    for wiersz in plansza:
+        assert set(wiersz) == wymagane
+
+    for kolumna in range(9):
+        assert {plansza[wiersz][kolumna] for wiersz in range(9)} == wymagane
+
+    for start_wiersz in range(0, 9, 3):
+        for start_kolumna in range(0, 9, 3):
+            kwadrat = {
+                plansza[w][k]
+                for w in range(start_wiersz, start_wiersz + 3)
+                for k in range(start_kolumna, start_kolumna + 3)
+            }
+            assert kwadrat == wymagane
+
+
+def test_konstruktor_wczytuje_kod_planszy():
+    plansza = Plansza(POPRAWNY_KOD)
+
+    assert plansza.plansza[0][0] == 5
+    assert plansza.plansza[0][1] == 3
+    assert plansza.plansza[8][8] == 9
+    assert plansza.plansza_na_kod() == POPRAWNY_KOD
+
+
+def test_plansza_na_kod_dziala_dla_aktualnej_planszy():
+    plansza = Plansza(POPRAWNY_KOD)
+
+    kod = plansza.plansza_na_kod()
+
+    assert kod == POPRAWNY_KOD
+    assert len(kod) == 81
+
+
+def test_znajdz_puste_pole_zwraca_false_dla_pelnej_planszy():
+    plansza = Plansza(POPRAWNY_KOD)
+
+    assert plansza.znajdz_puste_pole() is False
+
+
+def test_znajdz_puste_pole_zwraca_pierwsze_zero():
+    kod = "0" + POPRAWNY_KOD[1:]
+    plansza = Plansza(kod)
+
+    assert plansza.znajdz_puste_pole() == (0, 0)
+
+
+def test_sprawdz_pole_pozwala_na_poprawna_liczbe():
+    kod = "0" + POPRAWNY_KOD[1:]
+    plansza = Plansza(kod)
+
+    assert plansza.sprawdz_pole(5, (0, 0)) is True
+
+
+def test_sprawdz_pole_blokuje_bledna_liczbe_w_wierszu():
+    kod = "0" + POPRAWNY_KOD[1:]
+    plansza = Plansza(kod)
+
+    assert plansza.sprawdz_pole(3, (0, 0)) is False
+
+
+def test_sprawdz_pole_blokuje_bledna_liczbe_w_kolumnie():
+    kod = "0" + POPRAWNY_KOD[1:]
+    plansza = Plansza(kod)
+
+    assert plansza.sprawdz_pole(6, (0, 0)) is False
+
+
+def test_sprawdz_pole_blokuje_bledna_liczbe_w_kwadracie():
+    kod = "0" + POPRAWNY_KOD[1:]
+    plansza = Plansza(kod)
+
+    assert plansza.sprawdz_pole(9, (0, 0)) is False
+
+
+def test_czy_rozwiazana_zwraca_true_dla_poprawnej_pelnej_planszy():
+    plansza = Plansza(POPRAWNY_KOD)
+
+    assert plansza.czy_rozwiazana() is True
+
+
+def test_czy_rozwiazana_zwraca_false_dla_planszy_z_zerem():
+    kod = "0" + POPRAWNY_KOD[1:]
+    plansza = Plansza(kod)
+
+    assert plansza.czy_rozwiazana() is False
+
+
+def test_pobierz_bledy_wykrywa_duplikat():
+    plansza = Plansza(POPRAWNY_KOD)
+
+    plansza.plansza[0][0] = 3
+
+    bledy = plansza.pobierz_bledy()
+
+    assert (0, 0) in bledy
+
+
+def test_rozwiaz_rozwiazuje_poprawna_niepelna_plansze():
+    kod = (
+        "530070000"
+        "600195000"
+        "098000060"
+        "800060003"
+        "400803001"
+        "700020006"
+        "060000280"
+        "000419005"
+        "000080079"
+    )
+
+    plansza = Plansza(kod)
+    wynik = plansza.rozwiaz()
+
+    assert wynik is not False
+    assert plansza.czy_rozwiazana() is True
+    assert plansza.plansza_na_kod() == POPRAWNY_KOD
+
+
+@pytest.mark.parametrize(
+    "trudnosc, oczekiwana_liczba_zer",
+    [
+        (0, 36),
+        (1, 46),
+        (2, 52),
+    ],
+)
+def test_generuj_kod_planszy_gry_zwraca_poprawne_kody(trudnosc, oczekiwana_liczba_zer):
+    plansza = Plansza()
+
+    kod_gry, kod_rozwiazania = plansza.generuj_kod_planszy_gry(trudnosc)
+
+    assert isinstance(kod_gry, str)
+    assert isinstance(kod_rozwiazania, str)
+
+    assert len(kod_gry) == 81
+    assert len(kod_rozwiazania) == 81
+
+    assert all(znak in "0123456789" for znak in kod_gry)
+    assert all(znak in "123456789" for znak in kod_rozwiazania)
+
+    assert kod_gry.count("0") == oczekiwana_liczba_zer
+
+    czy_poprawne_sudoku(kod_rozwiazania)
+
+
+@pytest.mark.parametrize("trudnosc", [0, 1, 2])
+def test_wygenerowana_plansza_ma_jedno_rozwiazanie(trudnosc):
+    plansza = Plansza()
+
+    kod_gry, _ = plansza.generuj_kod_planszy_gry(trudnosc)
+
+    plansza_do_sprawdzenia = Plansza(kod_gry)
+    rozwiazania = plansza_do_sprawdzenia.znajdz_liczbe_rozwiazan()
+
+    assert len(rozwiazania) == 1
+#testy okno gry
+from PyQt5.QtCore import Qt
+
+import okno_gry
+from okno_gry import GlowneOkno, SudokuCell
+
+
+KOD_GRY_TESTOWY = (
+    "530070000"
+    "600195000"
+    "098000060"
+    "800060003"
+    "400803001"
+    "700020006"
+    "060000280"
+    "000419005"
+    "000080079"
+)
+
+KOD_ROZWIAZANIA_TESTOWY = (
+    "534678912"
+    "672195348"
+    "198342567"
+    "859761423"
+    "426853791"
+    "713924856"
+    "961537284"
+    "287419635"
+    "345286179"
+)
+
+
+class FakePlansza:
+    def generuj_kod_planszy_gry(self, trudnosc):
+        return KOD_GRY_TESTOWY, KOD_ROZWIAZANIA_TESTOWY
+
+
+@pytest.fixture
+def okno(app, qtbot):
+    okno = GlowneOkno()
+    qtbot.addWidget(okno)
+    return okno
+
+
+@pytest.fixture
+def okno_z_mockowanym_generatorem(app, qtbot, monkeypatch):
+    monkeypatch.setattr(okno_gry, "Plansza", FakePlansza)
+
+    okno = GlowneOkno()
+    qtbot.addWidget(okno)
+    return okno
+
+
+def test_glowne_okno_tworzy_sie(okno):
+    assert okno is not None
+    assert okno.windowTitle() == okno.translate("window_title")
+    assert okno.jezyk == "pl"
+    assert okno.zycia == 3
+    assert okno.liczba_podpowiedzi == 3
+    assert okno.gra_zakonczona is False
+
+
+def test_ekrany_sa_utworzone(okno):
+    assert hasattr(okno, "ekran_menu")
+    assert hasattr(okno, "ekran_gry")
+    assert okno.stos_ekranow.count() == 2
+    assert okno.stos_ekranow.currentWidget() == okno.ekran_menu
+
+
+def test_menu_ma_podstawowe_elementy(okno):
+    assert okno.napis_sudoku.text() == okno.translate("sudoku_title")
+    assert okno.lineedit_nazwa_swoja.placeholderText() == okno.translate("your_name")
+    assert okno.przycisk_start.text() == okno.translate("start_game")
+
+    assert okno.radio_latwy.text() == okno.translate("easy")
+    assert okno.radio_sredni.text() == okno.translate("medium")
+    assert okno.radio_trudny.text() == okno.translate("hard")
+
+
+def test_domyslny_poziom_trudnosci_to_sredni(okno):
+    assert okno.radio_sredni.isChecked()
+    assert not okno.radio_latwy.isChecked()
+    assert not okno.radio_trudny.isChecked()
+
+
+def test_zmiana_jezyka_na_angielski(okno):
+    okno.setJezyk("en")
+
+    assert okno.jezyk == "en"
+    assert okno.windowTitle() == "Sudoku"
+    assert okno.grupa1.title() == "Registration"
+    assert okno.napis_nazwa_swoja.text() == "Enter your name:"
+    assert okno.lineedit_nazwa_swoja.placeholderText() == "Your name"
+    assert okno.grupa2.title() == "Difficulty level"
+    assert okno.radio_latwy.text() == "Easy"
+    assert okno.radio_sredni.text() == "Medium"
+    assert okno.radio_trudny.text() == "Hard"
+    assert okno.przycisk_start.text() == "START GAME"
+
+
+def test_zmiana_jezyka_na_ukrainski(okno):
+    okno.setJezyk("ua")
+
+    assert okno.jezyk == "ua"
+    assert okno.napis_sudoku.text() == "СУДОКУ"
+    assert okno.przycisk_start.text() == "РОЗПОЧАТИ ГРУ"
+
+
+def test_nieznany_jezyk_nie_zmienia_ustawien(okno):
+    okno.setJezyk("xyz")
+
+    assert okno.jezyk == "pl"
+    assert okno.przycisk_start.text() == okno.translate("start_game")
+
+
+def test_plansza_ma_81_komorek(okno):
+    assert len(okno.komorki) == 9
+
+    for wiersz in okno.komorki:
+        assert len(wiersz) == 9
+
+    for r in range(9):
+        for c in range(9):
+            assert isinstance(okno.komorki[r][c], SudokuCell)
+            assert okno.komorki[r][c].row == r
+            assert okno.komorki[r][c].col == c
+
+
+def test_uruchom_gre_przelacza_na_ekran_gry(okno_z_mockowanym_generatorem):
+    okno = okno_z_mockowanym_generatorem
+
+    okno.uruchom_gre()
+
+    assert okno.stos_ekranow.currentWidget() == okno.ekran_gry
+    assert okno.gra_zakonczona is False
+    assert okno.zycia == 3
+    assert okno.liczba_podpowiedzi == 3
+    assert okno.przycisk_podpowiedz.isEnabled()
+
+
+def test_uruchom_gre_ustawia_plansze(okno_z_mockowanym_generatorem):
+    okno = okno_z_mockowanym_generatorem
+
+    okno.uruchom_gre()
+
+    assert okno.aktualna_plansza[0][0] == 5
+    assert okno.aktualna_plansza[0][2] == 0
+    assert okno.poprawna_plansza[0][2] == 4
+
+    assert okno.komorki[0][0].wartosc == "5"
+    assert okno.komorki[0][0].wygenerowane is True
+
+    assert okno.komorki[0][2].wartosc == ""
+    assert okno.komorki[0][2].wygenerowane is False
+
+
+def test_przycisk_start_uruchamia_gre(qtbot, okno_z_mockowanym_generatorem):
+    okno = okno_z_mockowanym_generatorem
+    okno.show()
+
+    qtbot.mouseClick(okno.przycisk_start, Qt.LeftButton)
+
+    assert okno.stos_ekranow.currentWidget() == okno.ekran_gry
+
+
+def test_przycisk_wroc_wraca_do_menu(okno_z_mockowanym_generatorem, qtbot):
+    okno = okno_z_mockowanym_generatorem
+    okno.uruchom_gre()
+
+    assert okno.stos_ekranow.currentWidget() == okno.ekran_gry
+
+    qtbot.mouseClick(okno.przycisk_wroc, Qt.LeftButton)
+
+    assert okno.stos_ekranow.currentWidget() == okno.ekran_menu
+
+
+def test_odejmij_zycie_zmniejsza_liczbe_zyc(okno, monkeypatch):
+    monkeypatch.setattr(okno, "zakoncz_gre", lambda wygrana=False: None)
+
+    okno.zycia = 3
+    wynik = okno.odejmij_zycie()
+
+    assert wynik is True
+    assert okno.zycia == 2
+
+
+def test_odejmij_zycie_konczy_gre_przy_zerze(okno, monkeypatch):
+    wywolania = []
+
+    def fake_zakoncz_gre(wygrana=False):
+        wywolania.append(wygrana)
+        okno.gra_zakonczona = True
+
+    monkeypatch.setattr(okno, "zakoncz_gre", fake_zakoncz_gre)
+
+    okno.zycia = 1
+    wynik = okno.odejmij_zycie()
+
+    assert wynik is False
+    assert okno.zycia == 0
+    assert okno.gra_zakonczona is True
+    assert wywolania == [False]
+
+
+def test_podswietlenie_zapamietuje_aktywna_komorke(okno_z_mockowanym_generatorem):
+    okno = okno_z_mockowanym_generatorem
+    okno.uruchom_gre()
+
+    okno.podswietl_obszary(4, 4)
+
+    assert okno.akt_wiersz == 4
+    assert okno.akt_kolumna == 4
+
+
+def test_tryb_notatek_wpisuje_notatke(qtbot, okno_z_mockowanym_generatorem, monkeypatch):
+    okno = okno_z_mockowanym_generatorem
+    okno.uruchom_gre()
+
+    monkeypatch.setattr(okno, "sprawdz_stan_gry", lambda: None)
+
+    komorka = okno.komorki[0][2]
+    assert komorka.wygenerowane is False
+
+    okno.checkbox_notatki.setChecked(True)
+
+    qtbot.keyClick(komorka, Qt.Key_4)
+
+    assert "4" in komorka.notatki
+    assert komorka.wartosc == ""
+
+
+def test_poprawna_cyfra_oznacza_komorke_jako_odgadnieta(qtbot, okno_z_mockowanym_generatorem, monkeypatch):
+    okno = okno_z_mockowanym_generatorem
+    okno.uruchom_gre()
+
+    monkeypatch.setattr(okno, "sprawdz_stan_gry", lambda: None)
+
+    komorka = okno.komorki[0][2]
+    assert okno.poprawna_plansza[0][2] == 4
+
+    qtbot.keyClick(komorka, Qt.Key_4)
+
+    assert komorka.wartosc == "4"
+    assert komorka.odgadnieta is True
+    assert komorka.czy_bledna is False
+    assert okno.aktualna_plansza[0][2] == 4
+
+
+def test_bledna_cyfra_odejmuje_zycie(qtbot, okno_z_mockowanym_generatorem, monkeypatch):
+    okno = okno_z_mockowanym_generatorem
+    okno.uruchom_gre()
+
+    monkeypatch.setattr(okno, "sprawdz_stan_gry", lambda: None)
+
+    komorka = okno.komorki[0][2]
+    assert okno.poprawna_plansza[0][2] == 4
+
+    okno.zycia = 3
+
+    qtbot.keyClick(komorka, Qt.Key_5)
+
+    assert komorka.wartosc == "5"
+    assert komorka.czy_bledna is True
+    assert okno.zycia == 2
+
+
+def test_centrowanie_okna_nie_powoduje_bledu(okno):
+    okno.wycentruj_okno()
+
+    assert okno.pos() is not None
