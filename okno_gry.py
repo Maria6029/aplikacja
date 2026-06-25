@@ -153,14 +153,16 @@ class SudokuCell(QLineEdit):
         self.setCursor(Qt.ArrowCursor)
 
     def focusInEvent(self, event):
-         """ Obsługuje kliknięcie lub wejścia fokusu w komórkę.
-            Informuje główne okno, która komórka planszy została aktualnie wybrana.
-            """
+        """
+        Obsługuje kliknięcie lub wejścia fokusu w komórkę.
+        Informuje główne okno, która komórka planszy została aktualnie wybrana.
+        """
         super().focusInEvent(event)
         self.fokus_otrzymany.emit(self.row, self.col)
 
     def keyPressEvent(self, event):
-        """ Obsługuje naciśnięcia klawiszy w komórce Sudoku.
+        """ 
+        Obsługuje naciśnięcia klawiszy w komórce Sudoku.
         Pozwala poruszać się po planszy za pomocą strzałek oraz klawiszy W, A, S, D.
         Po wykryciu odpowiedniego klawisza przenosi fokus na sąsiednią komórkę.
         """
@@ -235,12 +237,13 @@ class SudokuCell(QLineEdit):
         self.glowne_okno.sprawdz_stan_gry()
 
     def ustaw_poczatkowa(self, val):
-         """ Ustawia początkową wartość komórki Sudoku.
-            Jeśli wartość jest różna od zera, komórka staje się polem wygenerowanym
-            i nie jest traktowana jako pole do odgadnięcia. Jeśli wartość wynosi zero,
-            komórka pozostaje pusta. Funkcja czyści też notatki i zapamiętane błędy
-            przy rozpoczęciu nowej gry.
-            """
+        """
+        Ustawia początkową wartość komórki Sudoku.
+        Jeśli wartość jest różna od zera, komórka staje się polem wygenerowanym
+        i nie jest traktowana jako pole do odgadnięcia. Jeśli wartość wynosi zero,
+        komórka pozostaje pusta. Funkcja czyści też notatki i zapamiętane błędy
+        przy rozpoczęciu nowej gry.
+        """
         if val != 0:
             self.wartosc = str(val)
             self.wygenerowane = True
@@ -255,11 +258,12 @@ class SudokuCell(QLineEdit):
         self.odswiez_tekst()
 
     def odswiez_tekst(self):
-         """ Odświeża tekst wyświetlany w komórce.
-            Jeśli komórka ma wpisaną wartość, pokazuje ją na środku pola.
-            Jeśli nie ma wartości, ale ma notatki, pokazuje je w prawym górnym rogu.
-            Jeśli komórka jest pusta i nie ma notatek, czyści jej zawartość.
-            """
+        """ 
+        Odświeża tekst wyświetlany w komórce.
+        Jeśli komórka ma wpisaną wartość, pokazuje ją na środku pola.
+        Jeśli nie ma wartości, ale ma notatki, pokazuje je w prawym górnym rogu.
+        Jeśli komórka jest pusta i nie ma notatek, czyści jej zawartość.
+        """
         if self.wartosc:
             self.setText(self.wartosc)
             self.setAlignment(Qt.AlignCenter)
@@ -302,7 +306,7 @@ class GlowneOkno(QMainWindow):
         return self.translations.get(self.jezyk, {}).get(key, key)
 
     def setJezyk(self, jezyk):
-         """ Zmienia język interfejsu gry.
+        """ Zmienia język interfejsu gry.
         Jeśli wybrany język istnieje i jest inny niż obecny, funkcja aktualizuje
         teksty widoczne w oknie, między innymi tytuł, etykiety, przyciski,
         poziomy trudności oraz tryb notatek.
@@ -633,7 +637,7 @@ class GlowneOkno(QMainWindow):
         self.stos_ekranow.addWidget(self.ekran_menu)
 
     def initGraUI(self):
-         """Tworzy i konfiguruje ekran gry."""
+        """Tworzy i konfiguruje ekran gry."""
         self.ekran_gry = QWidget()
         self.ekran_gry.setStyleSheet(f"background-color: {rgb(162, 171, 31)};")
         
@@ -865,6 +869,9 @@ class GlowneOkno(QMainWindow):
         #Sprawdzenie, czy to nie jest pole startowe 
         if komorka.wygenerowane:
             QMessageBox.information(self, "Podpowiedź", self.translate("hint_start_cell"))
+            return
+        # Jeśli pole jest już odgadnięte, nie zużywamy kolejnej podpowiedzi
+        if komorka.odgadnieta:
             return
 
         poprawna_cyfra = self.poprawna_plansza[wiersz][kolumna]
