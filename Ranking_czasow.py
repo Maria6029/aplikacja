@@ -50,19 +50,26 @@ class RankingManager:
     """Klasa tworząca ranking czasów graczy z podziałem na poziomy trudności"""
 
     def __init__(self, nazwa_pliku="ranking.json"):
-        folder_domowy = os.path.expanduser("~")
-        folder_aplikacji = os.path.join(folder_domowy, ".sudoku_gra")
+        appdata_folder = os.environ.get("APPDATA")
+        if appdata_folder:
+            folder_aplikacji = os.path.join(appdata_folder, "SudokuGra")
+        else:
+            folder_domowy = os.path.expanduser("~")
+            folder_aplikacji = os.path.join(folder_domowy, ".sudoku_gra")
+
         if not os.path.exists(folder_aplikacji):
             os.makedirs(folder_aplikacji)
+            
         self.plik_bazy = os.path.join(folder_aplikacji, nazwa_pliku)
+        
         stara_lokalizacja = nazwa_pliku
         if os.path.exists(stara_lokalizacja):
             import shutil
             try:
                 shutil.move(stara_lokalizacja, self.plik_bazy)
-                print("Sukces: Stary ranking został bezpiecznie przeniesiony!")
-            except Exception as e:
-                print(f"Błąd migracji: {e}")
+            except Exception:
+                pass
+                
         self.wyniki = self.wczytaj_ranking()
     
     def wczytaj_ranking(self):
