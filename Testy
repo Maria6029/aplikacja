@@ -1,4 +1,5 @@
-#Testy ranking czasu
+# SEKCJA 1: TESTY RANKINGU CZASU (Ranking_czasow.py)
+
 import json
 import pytest
 
@@ -280,7 +281,7 @@ czas przekazuje właściwy poziom trudności i wynik do rankingu.
     assert poziom == "Trudny"
     assert manager.wyniki["Trudny"]["Olek"] == 42
 
-# Testy generatora planszy sudoku
+# SEKCJA 2: TESTY GENERATORA PLANSZ SUDOKU (generator.py)
 from generator import Plansza
 
 # Kompletny, poprawnie rozwiązany ciąg Sudoku używany jako wzorzec w testach
@@ -350,6 +351,19 @@ def test_plansza_na_kod_dziala_dla_aktualnej_planszy():
     assert len(kod) == 81
 
 
+"""
+SEKCJA: testy logiki gry i testów zasad
+
+Ten blok testów kompleksowo weryfikuje najważniejsze mechanizmy rozgrywki w Sudoku.
+Sprawdza on, czy program:
+1. Prawidłowo lokalizuje puste pola (oznaczone jako 0) i wie, kiedy ich brak.
+2. Reaguje na ruchy gracza, czyli pozwala na wpisanie poprawnej cyfry oraz 
+   blokuje niedozwolone duplikaty w wierszach, kolumnach i kwadratach 3x3.
+3. Potrafi przeskanować planszę, wykryć błędy i wskazać ich współrzędne.
+4. Bezblednie ocenia stan gry, ogłaszając wygraną tylko wtedy, gdy cała 
+   tabela jest pełna i ułożona w 100% poprawnie.
+"""
+
 def test_znajdz_puste_pole_zwraca_false_dla_pelnej_planszy():
     plansza = Plansza(POPRAWNY_KOD)
 
@@ -362,7 +376,7 @@ def test_znajdz_puste_pole_zwraca_pierwsze_zero():
 
     assert plansza.znajdz_puste_pole() == (0, 0)
 
-
+# Testy reguł walidacji reguł gry Sudoku
 def test_sprawdz_pole_pozwala_na_poprawna_liczbe():
     kod = "0" + POPRAWNY_KOD[1:]
     plansza = Plansza(kod)
@@ -390,7 +404,7 @@ def test_sprawdz_pole_blokuje_bledna_liczbe_w_kwadracie():
 
     assert plansza.sprawdz_pole(9, (0, 0)) is False
 
-
+# Testy stanu gry
 def test_czy_rozwiazana_zwraca_true_dla_poprawnej_pelnej_planszy():
     plansza = Plansza(POPRAWNY_KOD)
 
@@ -413,8 +427,11 @@ def test_pobierz_bledy_wykrywa_duplikat():
 
     assert (0, 0) in bledy
 
-
+# Testy algorytmu rozwiązującego Sudoku
 def test_rozwiaz_rozwiazuje_poprawna_niepelna_plansze():
+ """
+Sprawdza, czy potrafi uzupełnić brakujące pola i doprowadzić niepełną planszę do stanu referencyjnego.
+"""
     kod = (
         "530070000"
         "600195000"
@@ -435,6 +452,7 @@ def test_rozwiaz_rozwiazuje_poprawna_niepelna_plansze():
     assert plansza.plansza_na_kod() == POPRAWNY_KOD
 
 
+# Testy generowania nowej gry oparte o parametryzację
 @pytest.mark.parametrize(
     "trudnosc, oczekiwana_liczba_zer",
     [
@@ -444,6 +462,10 @@ def test_rozwiaz_rozwiazuje_poprawna_niepelna_plansze():
     ],
 )
 def test_generuj_kod_planszy_gry_zwraca_poprawne_kody(trudnosc, oczekiwana_liczba_zer):
+"""
+Sprawdza, czy dla każdego poziomu trudności generowany jest prawidłowy zestaw stringów (kod gry z zerami
+oraz kod rozwiązania bez zer) oraz czy liczba usuniętych pól (zer) odpowiada specyfikacji poziomu trudności.
+"""
     plansza = Plansza()
 
     kod_gry, kod_rozwiazania = plansza.generuj_kod_planszy_gry(trudnosc)
@@ -464,6 +486,10 @@ def test_generuj_kod_planszy_gry_zwraca_poprawne_kody(trudnosc, oczekiwana_liczb
 
 @pytest.mark.parametrize("trudnosc", [0, 1, 2])
 def test_wygenerowana_plansza_ma_jedno_rozwiazanie(trudnosc):
+"""
+Zapewnia, że każda wygenerowana plansza do gry
+posiada dokładnie JEDNO unikalne rozwiązanie.
+"""
     plansza = Plansza()
 
     kod_gry, _ = plansza.generuj_kod_planszy_gry(trudnosc)
@@ -472,13 +498,15 @@ def test_wygenerowana_plansza_ma_jedno_rozwiazanie(trudnosc):
     rozwiazania = plansza_do_sprawdzenia.znajdz_liczbe_rozwiazan()
 
     assert len(rozwiazania) == 1
-#testy okno gry
+
+
+# SEKCJA 3: TESTY INTERFEJSU GRAFICZNEGO GRY (okno_gry.py)
 from PyQt5.QtCore import Qt
 
 import okno_gry
 from okno_gry import GlowneOkno, SudokuCell
 
-
+# Predefiniowane ciągi tekstowe planszy przygotowane specjalnie do testów
 KOD_GRY_TESTOWY = (
     "530070000"
     "600195000"
