@@ -49,16 +49,28 @@ def translate(lang, key):
 class RankingManager:
     """Klasa tworząca ranking czasów graczy z podziałem na poziomy trudności"""
 
-    def __init__(self, plik_bazy="ranking.json"):
-        self.plik_bazy = plik_bazy
+    def __init__(self, nazwa_pliku="ranking.json"):
+        folder_domowy = os.path.expanduser("~")
+        folder_aplikacji = os.path.join(folder_domowy, ".sudoku_gra")
+        if not os.path.exists(folder_aplikacji):
+            os.makedirs(folder_aplikacji)
+        self.plik_bazy = os.path.join(folder_aplikacji, nazwa_pliku)
+        stara_lokalizacja = nazwa_pliku
+        if os.path.exists(stara_lokalizacja):
+            import shutil
+            try:
+                shutil.move(stara_lokalizacja, self.plik_bazy)
+                print("Sukces: Stary ranking został bezpiecznie przeniesiony!")
+            except Exception as e:
+                print(f"Błąd migracji: {e}")
         self.wyniki = self.wczytaj_ranking()
-
+    
     def wczytaj_ranking(self):
         if os.path.exists(self.plik_bazy):
             with open(self.plik_bazy, "r", encoding="utf-8") as f:
                 return json.load(f)
         return {"Łatwy": {}, "Średni": {}, "Trudny": {}}
-
+    
     def zapisz_ranking(self):
         with open(self.plik_bazy, "w", encoding="utf-8") as f:
             json.dump(self.wyniki, f, ensure_ascii=False, indent=4)
@@ -293,7 +305,3 @@ if __name__ == "__main__":
     okno_testowe.show()
 
     sys.exit(app.exec_())
-
-
-
-
