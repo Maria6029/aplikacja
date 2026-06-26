@@ -5,23 +5,35 @@ import pytest
 import Ranking_czasow
 from Ranking_czasow import RankingManager, RankingOkno, translate
 
+# Testy funkcji tłumaczącej
 
 def test_translate_zwraca_tlumaczenie():
+"""
+Weryfikuje, czy funkcja translate poprawnie zwraca przetłumaczone frazy
+dla obsługiwanych języków (polski, angielski, ukraiński).
+"""
     assert translate("pl", "time") == "Czas"
     assert translate("en", "time") == "Time"
     assert translate("ua", "time") == "Час"
 
 
 def test_translate_zwraca_klucz_gdy_brak_tlumaczenia():
+"""
+Sprawdza czy jeśli klucz lub język nie istnieje, to
+funkcja zwraca przekazany klucz jako tekst domyślny.
+"""
     assert translate("pl", "nie_istnieje") == "nie_istnieje"
     assert translate("xx", "time") == "time"
 
+# Testy RankingManager
 
 def test_wczytaj_ranking_gdy_plik_nie_istnieje(tmp_path):
+"""
+Sprawdza, czy w przypadku braku pliku JSON inicjalizowana jest
+struktura słownika z domyślnymi poziomami trudności.
+"""
     plik = tmp_path / "ranking.json"
-
     manager = RankingManager(str(plik))
-
     assert manager.wyniki == {
         "Łatwy": {},
         "Średni": {},
@@ -30,11 +42,16 @@ def test_wczytaj_ranking_gdy_plik_nie_istnieje(tmp_path):
 
 
 def test_dodaj_wynik_twody_plik_json(tmp_path):
+ """
+Weryfikuje, czy dodanie nowego wyniku poprawnie zapisuje dane do pliku fizycznego
+oraz czy struktura zapisanego pliku JSON jest poprawna.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
     manager.dodaj_wynik("Olek", "Średni", 123)
 
+    # Sprawdzenie, czy plik fizycznie powstał na dysku
     assert plik.exists()
 
     with open(plik, "r", encoding="utf-8") as f:
@@ -44,6 +61,10 @@ def test_dodaj_wynik_twody_plik_json(tmp_path):
 
 
 def test_dodaj_wynik_przycina_puste_znaki_w_imieniu(tmp_path):
+ """
+Sprawdza, czy funkcja dodawania wyniku usuwa spacje
+z początku i końca imienia gracza.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -54,6 +75,10 @@ def test_dodaj_wynik_przycina_puste_znaki_w_imieniu(tmp_path):
 
 
 def test_dodaj_wynik_puste_imie_zamienia_na_anonim(tmp_path):
+"""
+Weryfikuje, czy w przypadku pozostawienia pustego pola z imieniem,
+system automatycznie przypisuje graczowi domyślny nick "Anonim".
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -64,6 +89,10 @@ def test_dodaj_wynik_puste_imie_zamienia_na_anonim(tmp_path):
 
 
 def test_dodaj_wynik_zachowuje_lepszy_czas_tego_samego_gracza(tmp_path):
+"""
+Sprawdza mechanizm bicia rekordów: jeśli gracz uzyska krótszy czas,
+ranking powinien zostać zaktualizowany o nową wartość.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -74,6 +103,10 @@ def test_dodaj_wynik_zachowuje_lepszy_czas_tego_samego_gracza(tmp_path):
 
 
 def test_dodaj_wynik_nie_nadpisuje_gorszym_czasem(tmp_path):
+"""
+Upewnia się, że jeśli istniejący gracz osiągnie gorszy czas,
+to jego stary, lepszy wynik nie zostanie nadpisany.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -84,6 +117,10 @@ def test_dodaj_wynik_nie_nadpisuje_gorszym_czasem(tmp_path):
 
 
 def test_dodaj_wynik_dodaje_nowy_poziom_jesli_brakuje(tmp_path):
+"""
+Jeśli dodajemy wynik dla poziomu, który domyślnie nie istnieje w słowniku,
+powinien on zostać dynamicznie utworzony.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -94,6 +131,10 @@ def test_dodaj_wynik_dodaje_nowy_poziom_jesli_brakuje(tmp_path):
 
 
 def test_pobierz_posortowany_ranking_sortuje_rosnaco_po_czasie(tmp_path):
+"""
+Weryfikuje funkcję wyjściową rankingu, upewnia się, że pobrane wyniki są
+zwracane jako posortowana lista krotek, gdzie najkrótszy czas jest pierwszy.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
