@@ -536,22 +536,26 @@ class FakePlansza:
     def generuj_kod_planszy_gry(self, trudnosc):
         return KOD_GRY_TESTOWY, KOD_ROZWIAZANIA_TESTOWY
 
-
+# Fixture'y Pytest do przygotowania instancji okien
 @pytest.fixture
 def okno(app, qtbot):
+"""Fixture inicjalizujący czyste, standardowe GłówneOkno aplikacji"""
     okno = GlowneOkno()
     qtbot.addWidget(okno)
     return okno
-
 
 @pytest.fixture
 def okno_z_mockowanym_generatorem(app, qtbot, monkeypatch):
+"""
+Fixture przygotowujący okno gry, które zamiast losowego algorytmu generatora
+zawsze korzysta ze wcześniej zedfiniowanego FakePlansza.
+"""
     monkeypatch.setattr(okno_gry, "Plansza", FakePlansza)
-
     okno = GlowneOkno()
     qtbot.addWidget(okno)
     return okno
 
+# Testy stanu początkowego i struktury okna
 
 def test_glowne_okno_tworzy_sie(okno):
     assert okno is not None
@@ -584,6 +588,7 @@ def test_domyslny_poziom_trudnosci_to_sredni(okno):
     assert not okno.radio_latwy.isChecked()
     assert not okno.radio_trudny.isChecked()
 
+# Testy opcji językowych z interfejsu 
 
 def test_zmiana_jezyka_na_angielski(okno):
     okno.setJezyk("en")
@@ -614,6 +619,7 @@ def test_nieznany_jezyk_nie_zmienia_ustawien(okno):
     assert okno.jezyk == "pl"
     assert okno.przycisk_start.text() == okno.translate("start_game")
 
+# Testy siatki graficznej i logiki gry
 
 def test_plansza_ma_81_komorek(okno):
     assert len(okno.komorki) == 9
@@ -629,6 +635,10 @@ def test_plansza_ma_81_komorek(okno):
 
 
 def test_uruchom_gre_przelacza_na_ekran_gry(okno_z_mockowanym_generatorem):
+ """
+Sprawdza, czy wywołanie procedury startu gry prawidłowo przełącza widok na plansze,
+resetuje liczniki żyć oraz odblokowuje przycisk podpowiedzi.
+"""
     okno = okno_z_mockowanym_generatorem
 
     okno.uruchom_gre()
@@ -641,6 +651,10 @@ def test_uruchom_gre_przelacza_na_ekran_gry(okno_z_mockowanym_generatorem):
 
 
 def test_uruchom_gre_ustawia_plansze(okno_z_mockowanym_generatorem):
+"""
+Sprawdza integrację logiki z wyglądem, po starcie gry komórki odpowiadające cyfrom
+z generatora powinny być zablokowane, a pola puste (zera) przygotowane dla gracza.
+"""
     okno = okno_z_mockowanym_generatorem
 
     okno.uruchom_gre()
@@ -655,7 +669,8 @@ def test_uruchom_gre_ustawia_plansze(okno_z_mockowanym_generatorem):
     assert okno.komorki[0][2].wartosc == ""
     assert okno.komorki[0][2].wygenerowane is False
 
-
+# Pozostałe testy symulacji zdarzeń w grze
+# testy przycisków, dynamiki żyć, notatek, podświetlania komórki, centrowania okna gry
 def test_przycisk_start_uruchamia_gre(qtbot, okno_z_mockowanym_generatorem):
     okno = okno_z_mockowanym_generatorem
     okno.show()
