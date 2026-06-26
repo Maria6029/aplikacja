@@ -152,6 +152,11 @@ zwracane jako posortowana lista krotek, gdzie najkrótszy czas jest pierwszy.
 
 
 def test_wczytaj_ranking_z_istniejacego_pliku(tmp_path):
+ """
+Sprawdza, czy gra pamięta stare wyniki po ponownym uruchomieniu,
+czy program potrafi poprawnie otworzyć plik, 
+w którym są już zapisane wcześniejsze rekordy, i załadować je do gry.
+"""
     plik = tmp_path / "ranking.json"
     dane = {
         "Łatwy": {"Ala": 50},
@@ -166,8 +171,13 @@ def test_wczytaj_ranking_z_istniejacego_pliku(tmp_path):
 
     assert manager.wyniki == dane
 
+# Testy widoku okna gry
 
 def test_ranking_okno_formatuje_czas(app, qtbot, tmp_path):
+"""
+Testuje wewnętrzną metodę odpowiedzialną za konwersję
+liczby sekund do czytelnego formatu tekstowego MM:SS.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -181,6 +191,10 @@ def test_ranking_okno_formatuje_czas(app, qtbot, tmp_path):
 
 
 def test_ranking_okno_tworzy_trzy_zakladki(app, qtbot, tmp_path):
+ """
+Sprawdza komponent QTabWidget w oknie rankingu. Czy posiada dokładnie 3 zakładki,
+czy są poprawnie nazwane oraz czy domyślnie aktywna jest ta wskazana w argumencie.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -195,6 +209,11 @@ def test_ranking_okno_tworzy_trzy_zakladki(app, qtbot, tmp_path):
 
 
 def test_ranking_okno_wypelnia_tabele_danymi(app, qtbot, tmp_path):
+"""
+Testuje integrację danych z widokiem tabeli (QTableWidget).
+Weryfikuje, czy po wczytaniu wyników komórki tabeli zawierają numer pozycji w rankingu,
+nick gracza oraz sformatowany czas.
+"""
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -215,6 +234,11 @@ def test_ranking_okno_wypelnia_tabele_danymi(app, qtbot, tmp_path):
 
 
 def test_gra_zakonczona_sukcesem_zapisuje_czas_i_poziom(monkeypatch, tmp_path):
+"""
+Symuluje pomyślne zakończenie rozgrywki. Podstawia fałszywe implementacje
+dla pól tekstowych interfejsu, timerów oraz okien, sprawdzając czy metoda wyliczająca
+czas przekazuje właściwy poziom trudności i wynik do rankingu.
+"""
     plik = tmp_path / "ranking.json"
     zapisane_okna = []
 
@@ -255,10 +279,11 @@ def test_gra_zakonczona_sukcesem_zapisuje_czas_i_poziom(monkeypatch, tmp_path):
 
     assert poziom == "Trudny"
     assert manager.wyniki["Trudny"]["Olek"] == 42
-#testy genereator
+
+# Testy generatora planszy sudoku
 from generator import Plansza
 
-
+# Kompletny, poprawnie rozwiązany ciąg Sudoku używany jako wzorzec w testach
 POPRAWNY_KOD = (
     "534678912"
     "672195348"
@@ -273,20 +298,28 @@ POPRAWNY_KOD = (
 
 
 def kod_na_plansze(kod):
+ """Funkcja pomocnicza testu, która konwertuje płaski string znaków na dwuwymiarową listę 9x9 liczb int."""
     return [[int(kod[r * 9 + c]) for c in range(9)] for r in range(9)]
 
 
 def czy_poprawne_sudoku(kod):
+"""
+Algorytm walidujący poprawność Sudoku.
+Sprawdza unikalność cyfr 1-9 w każdym wierszu, kolumnie oraz podkwadracie 3x3.
+"""
     plansza = kod_na_plansze(kod)
 
     wymagane = set(range(1, 10))
 
+     # 1. Sprawdzenie wierszy
     for wiersz in plansza:
         assert set(wiersz) == wymagane
 
+     # 2. Sprawdzenie kolumn
     for kolumna in range(9):
         assert {plansza[wiersz][kolumna] for wiersz in range(9)} == wymagane
 
+     # 3. Sprawdzenie wszystkich 9 podkwadratów 3x3
     for start_wiersz in range(0, 9, 3):
         for start_kolumna in range(0, 9, 3):
             kwadrat = {
@@ -298,6 +331,7 @@ def czy_poprawne_sudoku(kod):
 
 
 def test_konstruktor_wczytuje_kod_planszy():
+"""Sprawdzamy, czy program potrafi zamienić jeden długi ciąg cyfr w czytelną dla komputera planszę do Sudoku"""
     plansza = Plansza(POPRAWNY_KOD)
 
     assert plansza.plansza[0][0] == 5
@@ -307,6 +341,7 @@ def test_konstruktor_wczytuje_kod_planszy():
 
 
 def test_plansza_na_kod_dziala_dla_aktualnej_planszy():
+"""Weryfikuje przekształcenie macierzy 9x9 z powrotem do ciągu tekstowego o poprawnej długości""
     plansza = Plansza(POPRAWNY_KOD)
 
     kod = plansza.plansza_na_kod()
