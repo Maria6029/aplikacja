@@ -9,30 +9,30 @@ from Ranking_czasow import RankingManager, RankingOkno, translate
 # Testy funkcji tłumaczącej
 
 def test_translate_zwraca_tlumaczenie():
-"""
-Weryfikuje, czy funkcja translate poprawnie zwraca przetłumaczone frazy
-dla obsługiwanych języków (polski, angielski, ukraiński).
-"""
+    """
+    Weryfikuje, czy funkcja translate poprawnie zwraca przetłumaczone frazy
+    dla obsługiwanych języków (polski, angielski, ukraiński).
+    """
     assert translate("pl", "time") == "Czas"
     assert translate("en", "time") == "Time"
     assert translate("ua", "time") == "Час"
 
 
 def test_translate_zwraca_klucz_gdy_brak_tlumaczenia():
-"""
-Sprawdza czy jeśli klucz lub język nie istnieje, to
-funkcja zwraca przekazany klucz jako tekst domyślny.
-"""
+    """
+    Sprawdza czy jeśli klucz lub język nie istnieje, to
+    funkcja zwraca przekazany klucz jako tekst domyślny.
+    """
     assert translate("pl", "nie_istnieje") == "nie_istnieje"
     assert translate("xx", "time") == "time"
 
 # Testy RankingManager
 
 def test_wczytaj_ranking_gdy_plik_nie_istnieje(tmp_path):
-"""
-Sprawdza, czy w przypadku braku pliku JSON inicjalizowana jest
-struktura słownika z domyślnymi poziomami trudności.
-"""
+    """
+    Sprawdza, czy w przypadku braku pliku JSON inicjalizowana jest
+    struktura słownika z domyślnymi poziomami trudności.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
     assert manager.wyniki == {
@@ -43,10 +43,10 @@ struktura słownika z domyślnymi poziomami trudności.
 
 
 def test_dodaj_wynik_twody_plik_json(tmp_path):
- """
-Weryfikuje, czy dodanie nowego wyniku poprawnie zapisuje dane do pliku fizycznego
-oraz czy struktura zapisanego pliku JSON jest poprawna.
-"""
+    """
+    Weryfikuje, czy dodanie nowego wyniku poprawnie zapisuje dane do pliku fizycznego
+    oraz czy struktura zapisanego pliku JSON jest poprawna.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -62,10 +62,10 @@ oraz czy struktura zapisanego pliku JSON jest poprawna.
 
 
 def test_dodaj_wynik_przycina_puste_znaki_w_imieniu(tmp_path):
- """
-Sprawdza, czy funkcja dodawania wyniku usuwa spacje
-z początku i końca imienia gracza.
-"""
+    """
+    Sprawdza, czy funkcja dodawania wyniku usuwa spacje
+    z początku i końca imienia gracza.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -76,10 +76,10 @@ z początku i końca imienia gracza.
 
 
 def test_dodaj_wynik_puste_imie_zamienia_na_anonim(tmp_path):
-"""
-Weryfikuje, czy w przypadku pozostawienia pustego pola z imieniem,
-system automatycznie przypisuje graczowi domyślny nick "Anonim".
-"""
+    """
+    Weryfikuje, czy w przypadku pozostawienia pustego pola z imieniem,
+    system automatycznie przypisuje graczowi domyślny nick "Anonim".
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -90,10 +90,10 @@ system automatycznie przypisuje graczowi domyślny nick "Anonim".
 
 
 def test_dodaj_wynik_zachowuje_lepszy_czas_tego_samego_gracza(tmp_path):
-"""
-Sprawdza mechanizm bicia rekordów: jeśli gracz uzyska krótszy czas,
-ranking powinien zostać zaktualizowany o nową wartość.
-"""
+    """
+    Sprawdza mechanizm bicia rekordów: jeśli gracz uzyska krótszy czas,
+    ranking powinien zostać zaktualizowany o nową wartość.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -104,10 +104,10 @@ ranking powinien zostać zaktualizowany o nową wartość.
 
 
 def test_dodaj_wynik_nie_nadpisuje_gorszym_czasem(tmp_path):
-"""
-Upewnia się, że jeśli istniejący gracz osiągnie gorszy czas,
-to jego stary, lepszy wynik nie zostanie nadpisany.
-"""
+    """
+    Upewnia się, że jeśli istniejący gracz osiągnie gorszy czas,
+    to jego stary, lepszy wynik nie zostanie nadpisany.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -118,10 +118,10 @@ to jego stary, lepszy wynik nie zostanie nadpisany.
 
 
 def test_dodaj_wynik_dodaje_nowy_poziom_jesli_brakuje(tmp_path):
-"""
-Jeśli dodajemy wynik dla poziomu, który domyślnie nie istnieje w słowniku,
-powinien on zostać dynamicznie utworzony.
-"""
+    """
+    Jeśli dodajemy wynik dla poziomu, który domyślnie nie istnieje w słowniku,
+    powinien on zostać dynamicznie utworzony.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -132,10 +132,10 @@ powinien on zostać dynamicznie utworzony.
 
 
 def test_pobierz_posortowany_ranking_sortuje_rosnaco_po_czasie(tmp_path):
-"""
-Weryfikuje funkcję wyjściową rankingu, upewnia się, że pobrane wyniki są
-zwracane jako posortowana lista krotek, gdzie najkrótszy czas jest pierwszy.
-"""
+    """
+    Weryfikuje funkcję wyjściową rankingu, upewnia się, że pobrane wyniki są
+    zwracane jako posortowana lista krotek, gdzie najkrótszy czas jest pierwszy.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -153,11 +153,11 @@ zwracane jako posortowana lista krotek, gdzie najkrótszy czas jest pierwszy.
 
 
 def test_wczytaj_ranking_z_istniejacego_pliku(tmp_path):
- """
-Sprawdza, czy gra pamięta stare wyniki po ponownym uruchomieniu,
-czy program potrafi poprawnie otworzyć plik, 
-w którym są już zapisane wcześniejsze rekordy, i załadować je do gry.
-"""
+    """
+    Sprawdza, czy gra pamięta stare wyniki po ponownym uruchomieniu,
+    czy program potrafi poprawnie otworzyć plik,
+    w którym są już zapisane wcześniejsze rekordy, i załadować je do gry.
+    """
     plik = tmp_path / "ranking.json"
     dane = {
         "Łatwy": {"Ala": 50},
@@ -175,10 +175,10 @@ w którym są już zapisane wcześniejsze rekordy, i załadować je do gry.
 # Testy widoku okna gry
 
 def test_ranking_okno_formatuje_czas(app, qtbot, tmp_path):
-"""
-Testuje wewnętrzną metodę odpowiedzialną za konwersję
-liczby sekund do czytelnego formatu tekstowego MM:SS.
-"""
+    """
+    Testuje wewnętrzną metodę odpowiedzialną za konwersję
+    liczby sekund do czytelnego formatu tekstowego MM:SS.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -192,10 +192,10 @@ liczby sekund do czytelnego formatu tekstowego MM:SS.
 
 
 def test_ranking_okno_tworzy_trzy_zakladki(app, qtbot, tmp_path):
- """
-Sprawdza komponent QTabWidget w oknie rankingu. Czy posiada dokładnie 3 zakładki,
-czy są poprawnie nazwane oraz czy domyślnie aktywna jest ta wskazana w argumencie.
-"""
+    """
+    Sprawdza komponent QTabWidget w oknie rankingu. Czy posiada dokładnie 3 zakładki,
+    czy są poprawnie nazwane oraz czy domyślnie aktywna jest ta wskazana w argumencie.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -210,11 +210,11 @@ czy są poprawnie nazwane oraz czy domyślnie aktywna jest ta wskazana w argumen
 
 
 def test_ranking_okno_wypelnia_tabele_danymi(app, qtbot, tmp_path):
-"""
-Testuje integrację danych z widokiem tabeli (QTableWidget).
-Weryfikuje, czy po wczytaniu wyników komórki tabeli zawierają numer pozycji w rankingu,
-nick gracza oraz sformatowany czas.
-"""
+    """
+    Testuje integrację danych z widokiem tabeli (QTableWidget).
+    Weryfikuje, czy po wczytaniu wyników komórki tabeli zawierają numer pozycji w rankingu,
+    nick gracza oraz sformatowany czas.
+    """
     plik = tmp_path / "ranking.json"
     manager = RankingManager(str(plik))
 
@@ -235,11 +235,11 @@ nick gracza oraz sformatowany czas.
 
 
 def test_gra_zakonczona_sukcesem_zapisuje_czas_i_poziom(monkeypatch, tmp_path):
-"""
-Symuluje pomyślne zakończenie rozgrywki. Podstawia fałszywe implementacje
-dla pól tekstowych interfejsu, timerów oraz okien, sprawdzając czy metoda wyliczająca
-czas przekazuje właściwy poziom trudności i wynik do rankingu.
-"""
+    """
+    Symuluje pomyślne zakończenie rozgrywki. Podstawia fałszywe implementacje
+    dla pól tekstowych interfejsu, timerów oraz okien, sprawdzając czy metoda wyliczająca
+    czas przekazuje właściwy poziom trudności i wynik do rankingu.
+    """
     plik = tmp_path / "ranking.json"
     zapisane_okna = []
 
@@ -299,15 +299,15 @@ POPRAWNY_KOD = (
 
 
 def kod_na_plansze(kod):
- """Funkcja pomocnicza testu, która konwertuje płaski string znaków na dwuwymiarową listę 9x9 liczb int."""
+    """Funkcja pomocnicza testu, która konwertuje płaski string znaków na dwuwymiarową listę 9x9 liczb int."""
     return [[int(kod[r * 9 + c]) for c in range(9)] for r in range(9)]
 
 
 def czy_poprawne_sudoku(kod):
-"""
-Algorytm walidujący poprawność Sudoku.
-Sprawdza unikalność cyfr 1-9 w każdym wierszu, kolumnie oraz podkwadracie 3x3.
-"""
+    """
+    Algorytm walidujący poprawność Sudoku.
+    Sprawdza unikalność cyfr 1-9 w każdym wierszu, kolumnie oraz podkwadracie 3x3.
+    """
     plansza = kod_na_plansze(kod)
 
     wymagane = set(range(1, 10))
@@ -332,7 +332,7 @@ Sprawdza unikalność cyfr 1-9 w każdym wierszu, kolumnie oraz podkwadracie 3x3
 
 
 def test_konstruktor_wczytuje_kod_planszy():
-"""Sprawdzamy, czy program potrafi zamienić jeden długi ciąg cyfr w czytelną dla komputera planszę do Sudoku"""
+    """Sprawdzamy, czy program potrafi zamienić jeden długi ciąg cyfr w czytelną dla komputera planszę do Sudoku"""
     plansza = Plansza(POPRAWNY_KOD)
 
     assert plansza.plansza[0][0] == 5
@@ -342,7 +342,7 @@ def test_konstruktor_wczytuje_kod_planszy():
 
 
 def test_plansza_na_kod_dziala_dla_aktualnej_planszy():
-"""Weryfikuje przekształcenie macierzy 9x9 z powrotem do ciągu tekstowego o poprawnej długości""
+    """Weryfikuje przekształcenie macierzy 9x9 z powrotem do ciągu tekstowego o poprawnej długości"""
     plansza = Plansza(POPRAWNY_KOD)
 
     kod = plansza.plansza_na_kod()
@@ -357,10 +357,10 @@ SEKCJA: testy logiki gry i testów zasad
 Ten blok testów kompleksowo weryfikuje najważniejsze mechanizmy rozgrywki w Sudoku.
 Sprawdza on, czy program:
 1. Prawidłowo lokalizuje puste pola (oznaczone jako 0) i wie, kiedy ich brak.
-2. Reaguje na ruchy gracza, czyli pozwala na wpisanie poprawnej cyfry oraz 
+2. Reaguje na ruchy gracza, czyli pozwala na wpisanie poprawnej cyfry oraz
    blokuje niedozwolone duplikaty w wierszach, kolumnach i kwadratach 3x3.
 3. Potrafi przeskanować planszę, wykryć błędy i wskazać ich współrzędne.
-4. Bezblednie ocenia stan gry, ogłaszając wygraną tylko wtedy, gdy cała 
+4. Bezblednie ocenia stan gry, ogłaszając wygraną tylko wtedy, gdy cała
    tabela jest pełna i ułożona w 100% poprawnie.
 """
 
@@ -429,9 +429,9 @@ def test_pobierz_bledy_wykrywa_duplikat():
 
 # Testy algorytmu rozwiązującego Sudoku
 def test_rozwiaz_rozwiazuje_poprawna_niepelna_plansze():
- """
-Sprawdza, czy potrafi uzupełnić brakujące pola i doprowadzić niepełną planszę do stanu referencyjnego.
-"""
+    """
+    Sprawdza, czy potrafi uzupełnić brakujące pola i doprowadzić niepełną planszę do stanu referencyjnego.
+    """
     kod = (
         "530070000"
         "600195000"
@@ -462,10 +462,10 @@ Sprawdza, czy potrafi uzupełnić brakujące pola i doprowadzić niepełną plan
     ],
 )
 def test_generuj_kod_planszy_gry_zwraca_poprawne_kody(trudnosc, oczekiwana_liczba_zer):
-"""
-Sprawdza, czy dla każdego poziomu trudności generowany jest prawidłowy zestaw stringów (kod gry z zerami
-oraz kod rozwiązania bez zer) oraz czy liczba usuniętych pól (zer) odpowiada specyfikacji poziomu trudności.
-"""
+    """
+    Sprawdza, czy dla każdego poziomu trudności generowany jest prawidłowy zestaw stringów (kod gry z zerami
+    oraz kod rozwiązania bez zer) oraz czy liczba usuniętych pól (zer) odpowiada specyfikacji poziomu trudności.
+    """
     plansza = Plansza()
 
     kod_gry, kod_rozwiazania = plansza.generuj_kod_planszy_gry(trudnosc)
@@ -486,10 +486,10 @@ oraz kod rozwiązania bez zer) oraz czy liczba usuniętych pól (zer) odpowiada 
 
 @pytest.mark.parametrize("trudnosc", [0, 1, 2])
 def test_wygenerowana_plansza_ma_jedno_rozwiazanie(trudnosc):
-"""
-Zapewnia, że każda wygenerowana plansza do gry
-posiada dokładnie JEDNO unikalne rozwiązanie.
-"""
+    """
+    Zapewnia, że każda wygenerowana plansza do gry
+    posiada dokładnie JEDNO unikalne rozwiązanie.
+    """
     plansza = Plansza()
 
     kod_gry, _ = plansza.generuj_kod_planszy_gry(trudnosc)
@@ -539,17 +539,17 @@ class FakePlansza:
 # Fixture'y Pytest do przygotowania instancji okien
 @pytest.fixture
 def okno(app, qtbot):
-"""Fixture inicjalizujący czyste, standardowe GłówneOkno aplikacji"""
+    """Fixture inicjalizujący czyste, standardowe GłówneOkno aplikacji"""
     okno = GlowneOkno()
     qtbot.addWidget(okno)
     return okno
 
 @pytest.fixture
 def okno_z_mockowanym_generatorem(app, qtbot, monkeypatch):
-"""
-Fixture przygotowujący okno gry, które zamiast losowego algorytmu generatora
-zawsze korzysta ze wcześniej zedfiniowanego FakePlansza.
-"""
+    """
+    Fixture przygotowujący okno gry, które zamiast losowego algorytmu generatora
+    zawsze korzysta ze wcześniej zedfiniowanego FakePlansza.
+    """
     monkeypatch.setattr(okno_gry, "Plansza", FakePlansza)
     okno = GlowneOkno()
     qtbot.addWidget(okno)
@@ -635,10 +635,10 @@ def test_plansza_ma_81_komorek(okno):
 
 
 def test_uruchom_gre_przelacza_na_ekran_gry(okno_z_mockowanym_generatorem):
- """
-Sprawdza, czy wywołanie procedury startu gry prawidłowo przełącza widok na plansze,
-resetuje liczniki żyć oraz odblokowuje przycisk podpowiedzi.
-"""
+    """
+    Sprawdza, czy wywołanie procedury startu gry prawidłowo przełącza widok na plansze,
+    resetuje liczniki żyć oraz odblokowuje przycisk podpowiedzi.
+    """
     okno = okno_z_mockowanym_generatorem
 
     okno.uruchom_gre()
@@ -651,10 +651,10 @@ resetuje liczniki żyć oraz odblokowuje przycisk podpowiedzi.
 
 
 def test_uruchom_gre_ustawia_plansze(okno_z_mockowanym_generatorem):
-"""
-Sprawdza integrację logiki z wyglądem, po starcie gry komórki odpowiadające cyfrom
-z generatora powinny być zablokowane, a pola puste (zera) przygotowane dla gracza.
-"""
+    """
+    Sprawdza integrację logiki z wyglądem, po starcie gry komórki odpowiadające cyfrom
+    z generatora powinny być zablokowane, a pola puste (zera) przygotowane dla gracza.
+    """
     okno = okno_z_mockowanym_generatorem
 
     okno.uruchom_gre()
